@@ -14,7 +14,7 @@
     "framer-motion": "^12.23.19",
     "gl-matrix": "^3.4.4",
     "lodash.debounce": "^4.0.8",
-    "mc-react-header": "^0.4.4",
+    "mc-react-header": "^0.4.5",
     "mc-react-library": "^0.5.0",
     "mc-react-structure-visualizer": "^0.8.4",
     "react": "^18.2.0",
