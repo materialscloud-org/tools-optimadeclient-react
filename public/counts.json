@@ -1,0 +1,474 @@
+[
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/aflow",
+    "children": [
+      {
+        "providerUrl": "https://aflow.org/API/optimade/",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/alexandria",
+    "children": [
+      {
+        "providerUrl": "https://alexandria.icams.rub.de/pbesol",
+        "elements": {
+          "min": 1,
+          "max": 8
+        },
+        "sites": {
+          "min": 1,
+          "max": 236
+        }
+      },
+      {
+        "providerUrl": "https://alexandria.icams.rub.de/pbe",
+        "elements": {
+          "min": 1,
+          "max": 9
+        },
+        "sites": {
+          "min": 1,
+          "max": 296
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/cod",
+    "children": [
+      {
+        "providerUrl": "https://www.crystallography.net/cod/optimade",
+        "elements": {
+          "min": 6,
+          "max": 6
+        },
+        "sites": {
+          "min": 140,
+          "max": 140
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/cmr",
+    "children": [
+      {
+        "providerUrl": "https://cmr-optimade.fysik.dtu.dk",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/exmpl",
+    "children": []
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/matcloud",
+    "children": []
+  },
+  {
+    "providerUrl": "https://www.materialscloud.org/optimade/main",
+    "children": [
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/mc3d-pbe-v1",
+        "elements": {
+          "min": 1,
+          "max": 8
+        },
+        "sites": {
+          "min": 1,
+          "max": 96
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/mc3d-pbesol-v1",
+        "elements": {
+          "min": 1,
+          "max": 8
+        },
+        "sites": {
+          "min": 1,
+          "max": 70
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/mc3d-pbesol-v2",
+        "elements": {
+          "min": 1,
+          "max": 8
+        },
+        "sites": {
+          "min": 1,
+          "max": 80
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/mc2d",
+        "elements": {
+          "min": 1,
+          "max": 6
+        },
+        "sites": {
+          "min": 1,
+          "max": 112
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/2dtopo",
+        "elements": {
+          "min": 1,
+          "max": 5
+        },
+        "sites": {
+          "min": 2,
+          "max": 40
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/pyrene-mofs",
+        "elements": {
+          "min": 4,
+          "max": 7
+        },
+        "sites": {
+          "min": 82,
+          "max": 1328
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/curated-cofs",
+        "elements": {
+          "min": 2,
+          "max": 7
+        },
+        "sites": {
+          "min": 30,
+          "max": 1404
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/stoceriaitf",
+        "elements": {
+          "min": 4,
+          "max": 4
+        },
+        "sites": {
+          "min": 520,
+          "max": 520
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/autowannier",
+        "elements": {
+          "min": 1,
+          "max": 3
+        },
+        "sites": {
+          "min": 1,
+          "max": 56
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/main/tin-antimony-sulfoiodide",
+        "elements": {
+          "min": 2,
+          "max": 4
+        },
+        "sites": {
+          "min": 16,
+          "max": 256
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://www.materialscloud.org/optimade/archive",
+    "children": [
+      {
+        "providerUrl": "https://optimade.materialscloud.org/archive/1z-pd",
+        "elements": {
+          "min": 1,
+          "max": 6
+        },
+        "sites": {
+          "min": 2,
+          "max": 96
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/archive/m0-zg",
+        "elements": {
+          "min": 1,
+          "max": 8
+        },
+        "sites": {
+          "min": 1,
+          "max": 296
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/archive/ed-g2",
+        "elements": {
+          "min": 1,
+          "max": 6
+        },
+        "sites": {
+          "min": 1,
+          "max": 96
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/archive/jk-9v",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      },
+      {
+        "providerUrl": "https://optimade.materialscloud.org/archive/zt-z4",
+        "elements": {
+          "min": 3,
+          "max": 3
+        },
+        "sites": {
+          "min": 10,
+          "max": 10
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/mp",
+    "children": [
+      {
+        "providerUrl": "https://optimade.materialsproject.org",
+        "elements": {
+          "min": 1,
+          "max": 9
+        },
+        "sites": {
+          "min": 1,
+          "max": 444
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/mpdd",
+    "children": [
+      {
+        "providerUrl": "http://mpddoptimade.phaseslab.org",
+        "elements": {
+          "min": 1,
+          "max": 9
+        },
+        "sites": {
+          "min": 1,
+          "max": 444
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/mpds",
+    "children": [
+      {
+        "providerUrl": "https://api.mpds.io",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/matterverse",
+    "children": [
+      {
+        "providerUrl": "https://optimade.matterverse.ai",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/mpod",
+    "children": [
+      {
+        "providerUrl": "http://mpod_optimade.cimav.edu.mx",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/nmd",
+    "children": [
+      {
+        "providerUrl": "https://nomad-lab.eu/prod/v1/optimade/",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://optimade-index.odbx.science",
+    "children": [
+      {
+        "providerUrl": "https://optimade.odbx.science",
+        "elements": {
+          "min": 1,
+          "max": 2
+        },
+        "sites": {
+          "min": 2,
+          "max": 108
+        }
+      },
+      {
+        "providerUrl": "https://optimade-misc.odbx.science",
+        "elements": {
+          "min": 1,
+          "max": 7
+        },
+        "sites": {
+          "min": 1,
+          "max": 368
+        }
+      },
+      {
+        "providerUrl": "https://optimade-gnome.odbx.science",
+        "elements": {
+          "min": 2,
+          "max": 6
+        },
+        "sites": {
+          "min": 2,
+          "max": 106
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://optimade-index.openmaterialsdb.se",
+    "children": [
+      {
+        "providerUrl": "http://optimade.openmaterialsdb.se",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/oqmd",
+    "children": [
+      {
+        "providerUrl": "https://oqmd.org/optimade/",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/jarvis",
+    "children": [
+      {
+        "providerUrl": "https://jarvis.nist.gov/optimade/jarvisdft",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/tcod",
+    "children": [
+      {
+        "providerUrl": "https://www.crystallography.net/tcod/optimade",
+        "elements": {
+          "min": null,
+          "max": null
+        },
+        "sites": {
+          "min": null,
+          "max": null
+        }
+      }
+    ]
+  },
+  {
+    "providerUrl": "https://providers.optimade.org/index-metadbs/twodmatpedia",
+    "children": [
+      {
+        "providerUrl": "http://optimade.2dmatpedia.org",
+        "elements": {
+          "min": 1,
+          "max": 4
+        },
+        "sites": {
+          "min": 1,
+          "max": 40
+        }
+      }
+    ]
+  }
+]

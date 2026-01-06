@@ -155,31 +155,31 @@ export async function getElementsCount({ providerUrl }) {
 }
 
 export async function getSitesCount({ providerUrl }) {
-  const attempts = [
-    { name: "direct", url: `${providerUrl}/v1/info/structures` },
-    ...corsProxies.map((proxy) => ({
-      name: proxy.name,
-      url: proxy.urlRule(`${providerUrl}/v1/info/structures`),
-    })),
-  ];
+  const start = performance.now();
 
-  for (const { url, name } of attempts) {
+  const minUrl = `${providerUrl}/v1/structures?sort=nsites&response_format=json&response_fields=nsites&page_limit=1`;
+  const maxUrl = `${providerUrl}/v1/structures?sort=-nsites&response_format=json&response_fields=nsites&page_limit=1`;
+
+  async function fetchValue(url) {
     try {
       const res = await fetch(url);
-      if (!res.ok) continue;
+      if (!res.ok) return null;
 
       const json = await res.json();
-      const filteredProps = Object.fromEntries(
-        Object.entries(json.data.properties || {}).filter(([key]) =>
-          key.startsWith("_")
-        )
-      );
+      const value = json?.data?.[0]?.attributes?.nsites;
 
-      return { customProps: filteredProps, error: null };
+      return typeof value === "number" ? value : null;
     } catch {
-      continue;
+      return null;
     }
   }
+
+  const min = await fetchValue(minUrl);
+  const max = await fetchValue(maxUrl);
+
+  const durationMs = performance.now() - start;
+
+  return { min, max, durationMs };
 }
 
 // very messy divide and conquer strategy for returning the elements that exist in the PT.

@@ -1,36 +1,48 @@
-// build-counts-cache.mjs
 import fs from "fs";
 import path from "path";
 import {
   getProvidersList,
   getProviderLinks,
   getElementsCount,
+  getSitesCount,
 } from "../src/api.js";
 
-const OUTPUT_PATH = path.resolve("./public/cachedElementCounts.json");
+const OUTPUT_PATH = path.resolve("./public/counts.json");
 
-// load old cache if available
-function loadCache() {
-  if (!fs.existsSync(OUTPUT_PATH)) return {};
-  try {
-    const data = JSON.parse(fs.readFileSync(OUTPUT_PATH, "utf-8"));
-    return Object.fromEntries(data.map((e) => [e.providerUrl, e]));
-  } catch (err) {
-    console.warn("Failed to parse existing cache:", err);
-    return {};
+async function processChild(url) {
+  if (!url || !url.startsWith("http")) {
+    console.log(`      Skipping invalid URL:`, url);
+    return null;
   }
+
+  console.log(`      Fetching counts for ${url}...`);
+
+  const [elementsRes, sitesRes] = await Promise.all([
+    getElementsCount({ providerUrl: url }),
+    getSitesCount({ providerUrl: url }),
+  ]);
+
+  const result = {
+    providerUrl: url,
+    elements: { min: elementsRes.min, max: elementsRes.max },
+    sites: { min: sitesRes.min, max: sitesRes.max },
+  };
+
+  console.log(
+    `      Finished → Elements[min=${result.elements.min}, max=${result.elements.max}], Sites[min=${result.sites.min}, max=${result.sites.max}]`
+  );
+
+  return result;
 }
 
-function saveCache(map) {
-  const arr = Object.values(map);
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(arr, null, 2));
-}
-
-async function processProvider(provider, cacheMap) {
+async function processProvider(provider) {
   const baseUrl = provider.attributes.base_url;
   if (!baseUrl || !baseUrl.startsWith("http")) {
-    console.log(`Skipping provider ${provider} (invalid base_url):`, baseUrl);
-    return;
+    console.log(
+      `Skipping provider ${provider.id} (invalid base_url):`,
+      baseUrl
+    );
+    return null;
   }
 
   console.log(`\n→ Provider: ${baseUrl}`);
@@ -40,66 +52,41 @@ async function processProvider(provider, cacheMap) {
     links = await getProviderLinks(baseUrl);
   } catch (err) {
     console.log(`  Failed to fetch provider links:`, err.message);
-    return;
+    return null;
   }
 
   if (links.error) {
     console.log(`  Provider returned error`);
-    return;
+    return null;
   }
 
   console.log(`  Children: ${links.children.length}`);
 
+  const childrenResults = [];
   for (const child of links.children) {
-    const url = child.attributes.base_url;
-    if (!url || !url.startsWith("http")) {
-      console.log(`    Skipping child (invalid URL):`, url);
-      continue;
-    }
-
-    console.log(`    → Child: ${url}`);
-
-    // Check for cache hit
-    if (cacheMap[url]?.min != null && cacheMap[url]?.max != null) {
-      console.log(
-        `      Cached ✓ (min=${cacheMap[url].min}, max=${cacheMap[url].max})`
-      );
-      continue;
-    }
-
-    console.log(`      Fetching element counts...`);
-
-    const { min, max, durationMs } = await getElementsCount({
-      providerUrl: url,
-    });
-
-    console.log(
-      `      Result: min=${min}, max=${max} fetchTime=${durationMs.toFixed(
-        0
-      )}ms`
-    );
-
-    cacheMap[url] = { providerUrl: url, min, max };
-    saveCache(cacheMap);
+    const childData = await processChild(child.attributes.base_url);
+    if (childData) childrenResults.push(childData);
   }
+
+  return {
+    providerUrl: baseUrl,
+    children: childrenResults,
+  };
 }
 
 async function main() {
-  const prevCache = loadCache();
-  const cacheMap = { ...prevCache };
-
   console.log("Loading providers list...");
-
   const { data: providers } = await getProvidersList();
-
   console.log(`Total providers: ${providers.length}`);
 
+  const results = [];
   for (const provider of providers) {
-    await processProvider(provider, cacheMap);
+    const providerData = await processProvider(provider);
+    if (providerData) results.push(providerData);
   }
 
-  saveCache(cacheMap);
-  console.log("\nDone. Cached element ranges written to", OUTPUT_PATH);
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(results, null, 2));
+  console.log("\nDone. Counts written to", OUTPUT_PATH);
 }
 
 main().catch((err) => {
