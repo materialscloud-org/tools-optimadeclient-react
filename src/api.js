@@ -82,7 +82,11 @@ export async function getInfo({ providerUrl }) {
         )
       );
 
-      return { customProps: filteredProps, error: null };
+      return {
+        customProps: filteredProps,
+        error: null,
+        allProps: json.data.properties,
+      };
     } catch {
       continue;
     }
@@ -100,20 +104,45 @@ export async function getStructures({
 }) {
   if (!providerUrl) throw new Error("Provider URL is required");
 
+  // We refetch the info here even though its already been fetched. This is a very clear area of inefficiency
+  let allFields = [];
+  try {
+    const { customProps, error, allProps } = await getInfo({ providerUrl });
+    if (error) console.warn("Could not fetch custom fields:", error);
+    if (allProps) allFields = Object.keys(allProps);
+  } catch (err) {
+    console.warn("Error fetching custom fields:", err);
+  }
+
+  const preferredFields = [
+    "cartesian_site_positions",
+    "species_at_sites",
+    "lattice_vectors",
+    "chemical_formula_descriptive",
+    "chemical_formula_hill",
+  ];
+
+  const mergedFields = Array.from(new Set([...preferredFields, ...allFields]));
+
   const offset = (page - 1) * pageSize;
   const queryString = filter
     ? `?filter=${encodeURIComponent(filter)}&page_offset=${offset}`
     : `?page_offset=${offset}`;
 
+  // 4. Build URL with dynamic response_fields
+  const urlWithFields = `${providerUrl}/v1/structures${queryString}&response_fields=${mergedFields.join(
+    ","
+  )}`;
+
   const attempts = [
-    { name: "direct", url: `${providerUrl}/v1/structures${queryString}` },
+    { name: "direct", url: urlWithFields },
     ...corsProxies.map((proxy) => ({
       name: proxy.name,
-      url: proxy.urlRule(`${providerUrl}/v1/structures${queryString}`),
+      url: proxy.urlRule(urlWithFields),
     })),
   ];
 
-  for (const { url, name } of attempts) {
+  for (const { url } of attempts) {
     try {
       const res = await fetch(url);
       if (!res.ok) continue;
@@ -274,9 +303,12 @@ export async function getPTablePopulation({
     )} seconds \n====== URL ${providerUrl} finished batch searches. ======\n`
   );
 
-  // Return result as a map of element symbol -> present
-  return elements.reduce((acc, e) => {
+  const elementMap = elements.reduce((acc, e) => {
     acc[e.sym] = presentElements.has(e.sym);
     return acc;
   }, {});
+  return {
+    ...elementMap, // <- top-level symbols (legacy)
+    timing: avgTimePerRequest, // <- new field
+  };
 }
