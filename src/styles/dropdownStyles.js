@@ -4,3 +4,5 @@ export const slateDropdown = `min-w-[325]
   hover:bg-slate-300 disabled:cursor-not-allowed
   disabled:bg-gray-100 text-sm md:text-base
 `;
+
+export const longSlateDropdown = slateDropdown + " min-w-[300px] max-w-[700px]";

@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { getProvidersList, getStructures } from "../../api";
 import OptimadeHeader from "./OptimadeHeader";
-import { DatabaseSelector } from "./DatabaseSelector";
 import OptimadeFilters from "./OptimadeFilters";
 import OptimadeFAQs from "./OptimadeFAQs";
 import { ResultViewer } from "./ResultViewer";
@@ -9,55 +8,50 @@ import ResultsDropdown from "./ResultsDropdown";
 import OptimadeProviderInfo from "./OptimadeProviderInfo";
 import { PaginationHandler } from "./PaginationHandler";
 import { AnimatePresence, motion } from "framer-motion";
-
 import OptimadeNoResults from "./OptimadeNoResults";
-
 import MaterialsCloudHeader from "mc-react-header";
 import OptimadeChildInfo from "./OptimadeChildInfo";
 import OptimadeParentInfo from "./OptimadeParentInfo";
-
-import { textHyperlink, textNormal, textSmall } from "../../styles/textStyles";
 import { containerStyle } from "../../styles/containerStyles";
+
+import ParentProviderDropdown from "./DropdownSelectors/parentProviderDropdown";
+import ChildProviderDropdown from "./DropdownSelectors/childProviderDropdown";
 
 export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
   const [providers, setProviders] = useState([]);
-  const [queryUrl, setQueryUrl] = useState("");
-  const [selectedChild, setSelectedChild] = useState(null);
   const [selectedProvider, setSelectedProvider] = useState(null);
+  const [selectedChild, setSelectedChild] = useState(null);
 
   const [currentFilter, setCurrentFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [currentResult, setCurrentResult] = useState(null);
-
   const [results, setResults] = useState(null);
+  const [currentResult, setCurrentResult] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [totalPages, setTotalPages] = useState(1);
   const [metaData, setMetaData] = useState({
     data_returned: 0,
     data_available: 0,
   });
+  const [totalPages, setTotalPages] = useState(1);
 
-  // Load providers once
   useEffect(() => {
     const loadProviders = async () => {
       try {
         const provObj = await getProvidersList(undefined, hideProviderList);
         setProviders(provObj.data);
       } catch (err) {
-        console.error("Error fetching providers:", err);
+        console.error(err);
       }
     };
     loadProviders();
   }, []);
 
-  // Fetch results whenever queryUrl, filter, or page changes
   const fetchResults = useCallback(async () => {
-    if (!queryUrl) return;
+    if (!selectedChild?.base_url) return;
 
     setLoading(true);
     try {
       const data = await getStructures({
-        providerUrl: queryUrl,
+        providerUrl: selectedChild?.base_url,
         filter: currentFilter,
         page: currentPage,
       });
@@ -65,21 +59,20 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
 
       const meta = data?.meta ?? { data_returned: 0, data_available: 0 };
       setMetaData(meta);
-      // we initalise totalPages to null if there is no indexing (i.e jk-9v)
       setTotalPages(
-        meta.data_returned != null && !isNaN(meta.data_returned)
+        meta.data_returned != null
           ? Math.max(1, Math.ceil(meta.data_returned / 20))
           : "N/A"
       );
 
       setCurrentResult(data?.data[0] || null);
     } catch (err) {
-      console.error("Error fetching structures:", err);
+      console.error(err);
       setCurrentResult(null);
     } finally {
       setLoading(false);
     }
-  }, [queryUrl, currentFilter, currentPage]);
+  }, [selectedChild, currentFilter, currentPage]);
 
   useEffect(() => {
     fetchResults();
@@ -89,42 +82,35 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
     <>
       <MaterialsCloudHeader
         className="header"
-        activeSection={"work"}
+        activeSection="work"
         breadcrumbsPath={[
-          {
-            name: "Work",
-            link: "https://www.materialscloud.org/work",
-          },
-          {
-            name: "OPTIMADE-Client",
-            link: null,
-          },
+          { name: "Work", link: "https://www.materialscloud.org/work" },
+          { name: "OPTIMADE-Client", link: null },
         ]}
       />
-      {/* make the inner container */}
+
       <div className="min-h-screen max-w-5xl mx-auto bg-white mb-4 shadow-md rounded-xs">
         <div className="flex flex-col items-center w-full px-2 md:px-4 py-2">
           <OptimadeHeader />
-
           <div className="p-2 w-full">
             <OptimadeFAQs />
           </div>
-          {/* Database selector */}
-          <div className="pt-4 p-2">
-            <DatabaseSelector
+
+          {/* Parent + Child Dropdowns */}
+          <div className="pt-4 p-2 w-full flex flex-col gap-2 max-w-[650px]">
+            <ParentProviderDropdown
               providers={providers}
-              onChildChange={setSelectedChild}
-              onProviderChange={setSelectedProvider}
-              onQueryUrlChange={(url) => {
-                // Only reset filter if provider actually changes
-                if (url !== queryUrl) {
-                  setQueryUrl(url);
-                  setCurrentPage(1);
-                }
-              }}
+              selectedProvider={selectedProvider}
+              onSelectProvider={setSelectedProvider}
+            />
+            <ChildProviderDropdown
+              selectedProvider={selectedProvider}
+              selectedChild={selectedChild}
+              onSelectChild={setSelectedChild}
             />
           </div>
 
+          {/* Info panels */}
           <div className="flex flex-col md:flex-row w-full max-w-5xl px-2 md:px-4 py-2 gap-4">
             <div className="md:w-1/2 w-full">
               <OptimadeParentInfo
@@ -132,7 +118,6 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
                 providers={providers}
               />
             </div>
-
             <div className="md:w-1/2 w-full">
               <OptimadeChildInfo child={selectedChild} />
             </div>
@@ -140,7 +125,7 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
 
           {/* Filters */}
           <div className="p-2 w-full">
-            <div style={{ display: queryUrl ? "block" : "none" }}>
+            {selectedChild?.base_url && (
               <AnimatePresence>
                 <motion.div
                   key="filters"
@@ -151,7 +136,7 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
                   className={containerStyle}
                 >
                   <OptimadeFilters
-                    queryUrl={queryUrl}
+                    queryUrl={selectedChild?.base_url}
                     onSubmit={(filter) => {
                       setCurrentFilter(filter);
                       setCurrentPage(1);
@@ -159,17 +144,16 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
                   />
                 </motion.div>
               </AnimatePresence>
-            </div>
+            )}
           </div>
 
           <div className="p-2 w-full">
-            <OptimadeProviderInfo queryUrl={queryUrl} />
+            <OptimadeProviderInfo queryUrl={selectedChild?.base_url} />
           </div>
 
-          {/* The results are only attempted to render if there is a valid query URL */}
-          {queryUrl && (
+          {/* Results */}
+          {selectedChild?.base_url && (
             <div className="px-2 md:px-4 w-full">
-              {/* Loading spinner haphazardly dumped in the middle of the section */}
               {loading && (
                 <div className="flex justify-center items-center h-[610px]">
                   <div className="w-16 h-16 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
@@ -178,19 +162,17 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
 
               <div className="border-b border-slate-300 py-2"></div>
 
-              {/* zero results - either through server/syntax or filters too tight */}
               {!loading && !currentResult && currentFilter && (
                 <div className="p-2">
                   <OptimadeNoResults
-                    queryUrl={queryUrl}
+                    queryUrl={selectedChild?.base_url}
                     currentFilter={currentFilter}
                   />
                 </div>
               )}
 
-              {/* Implies success  */}
               {!loading && results && currentResult && (
-                <div className="py-1 md:py-2 ">
+                <div className="py-1 md:py-2">
                   <div className="flex flex-col md:flex-row items-stretch md:items-end gap-4">
                     <div className="flex-1">
                       <ResultsDropdown

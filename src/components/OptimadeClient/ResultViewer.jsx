@@ -11,8 +11,6 @@ import { containerStyleHalf } from "../../styles/containerStyles";
 // TODO, switdch jsonview library
 
 export function ResultViewer({ selectedResult }) {
-  console.log("selectedResult", selectedResult);
-
   const lattice = selectedResult?.attributes?.lattice_vectors ?? [];
   const sitesRaw = selectedResult?.attributes?.cartesian_site_positions ?? [];
   const species = selectedResult?.attributes?.species_at_sites ?? [];
