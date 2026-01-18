@@ -16,12 +16,53 @@ import { containerStyle } from "../../styles/containerStyles";
 
 import ParentProviderDropdown from "./DropdownSelectors/parentProviderDropdown";
 import ChildProviderDropdown from "./DropdownSelectors/childProviderDropdown";
+import { useSearchParams } from "react-router-dom";
 
 export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [providers, setProviders] = useState([]);
-  const [selectedProvider, setSelectedProvider] = useState(null);
-  const [selectedChild, setSelectedChild] = useState(null);
 
+  const customProvider = searchParams.has("custom");
+  const customUrl = searchParams.get("custom_url");
+
+  // set selectedProvider when URL search params is in the custom state
+  const [selectedProvider, setSelectedProvider] = useState(
+    customProvider ? { id: "__custom__", base_url: "" } : null
+  );
+
+  // set selectedChild when URL search params is in the custom state
+  const [selectedChild, setSelectedChild] = useState(
+    customUrl ? { id: "__custom__", base_url: customUrl } : null
+  );
+
+  // remove search params when selected child is not in the custom state
+  useEffect(() => {
+    if (!selectedProvider || selectedProvider.id !== "__custom__") {
+      if (searchParams.has("custom")) {
+        const next = new URLSearchParams(searchParams);
+        next.delete("custom");
+        next.delete("custom_url");
+        setSearchParams(next, { replace: true });
+      }
+    }
+  }, [selectedProvider]);
+
+  // add URL search params when selectedChild is in the custom state
+  useEffect(() => {
+    const next = new URLSearchParams(searchParams);
+
+    if (selectedChild?.id === "__custom__" && selectedChild.base_url) {
+      next.set("custom", "");
+      next.set("custom_url", selectedChild.base_url);
+    } else {
+      next.delete("custom");
+      next.delete("custom_url");
+    }
+
+    setSearchParams(next, { replace: true });
+  }, [selectedChild]);
+
+  // filter and pages useStates
   const [currentFilter, setCurrentFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [results, setResults] = useState(null);
