@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { getProviderLinks } from "../../../api";
 import { longSlateDropdown } from "../../../styles/dropdownStyles";
+import { baseButtonStyle } from "../../../styles/buttonStyles";
 
 export default function ChildProviderDropdown({
   selectedProvider,
@@ -69,7 +70,7 @@ export default function ChildProviderDropdown({
           onChange={(e) => setCustomInput(e.target.value)}
         />
         <button
-          className="bg-blue-500 text-white px-3 py-1 rounded-sm"
+          className={`${baseButtonStyle} rounded-sm md:py-1!`}
           onClick={() =>
             onSelectChild({
               id: "__custom__",
