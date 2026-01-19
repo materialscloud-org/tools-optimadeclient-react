@@ -32,7 +32,7 @@ export function QueryTextBox({
           disabled={loading}
           className={`${baseButtonStyle} disabled:opacity-50`}
         >
-          {loading ? "Loading…" : "Submit"}
+          {loading ? "Loading…" : "Query"}
         </button>
       </form>
     </div>
