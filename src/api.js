@@ -5,7 +5,7 @@ import { elements } from "./components/OptimadeClient/OptimadeFilters/OptimadePT
 // --- Providers list ---
 export async function getProvidersList(
   providersUrl = "https://raw.githubusercontent.com/Materials-Consortia/providers/refs/heads/master/src/links/v1/providers.json",
-  excludeIds = []
+  excludeIds = [],
 ) {
   async function fetchJson(url) {
     const res = await fetch(url);
@@ -19,7 +19,7 @@ export async function getProvidersList(
   } catch (err) {
     console.warn(
       "Remote fetch failed, falling back to cachedProviders.json:",
-      err
+      err,
     );
     try {
       json = await fetchJson("cachedProviders.json");
@@ -60,14 +60,35 @@ export async function getProviderLinks(baseUrl) {
   return { children: [], error: new Error("All fetch attempts failed") };
 }
 
-// --- Provider info ---
+// --- Custom info fetch subdatabase info ---
+export async function getCustomInfo({ baseUrl }) {
+  const attempts = [
+    { name: "direct", url: `${baseUrl}/info/` },
+    ...corsProxies.map((proxy) => ({
+      name: proxy.name,
+      url: proxy.urlRule(`${baseUrl}/info/`),
+    })),
+  ];
+
+  for (const { url, name } of attempts) {
+    try {
+      console.log("fetching via url", url);
+      const res = await fetch(url);
+      if (!res.ok) continue;
+
+      const json = await res.json();
+
+      return { meta: json.meta ?? {} };
+    } catch {
+      continue;
+    }
+  }
+}
+
+// --- Provider structure info ---
 export async function getInfo({ providerUrl }) {
   const attempts = [
     { name: "direct", url: `${providerUrl}/v1/info/structures` },
-    ...corsProxies.map((proxy) => ({
-      name: proxy.name,
-      url: proxy.urlRule(`${providerUrl}/v1/info/structures`),
-    })),
   ];
 
   for (const { url, name } of attempts) {
@@ -78,8 +99,8 @@ export async function getInfo({ providerUrl }) {
       const json = await res.json();
       const filteredProps = Object.fromEntries(
         Object.entries(json.data.properties || {}).filter(([key]) =>
-          key.startsWith("_")
-        )
+          key.startsWith("_"),
+        ),
       );
 
       return {
@@ -131,7 +152,7 @@ export async function getStructures({
 
   // 4. Build URL with dynamic response_fields
   const urlWithFields = `${providerUrl}/v1/structures${queryString}&response_fields=${mergedFields.join(
-    ","
+    ",",
   )}`;
 
   const attempts = [
@@ -265,7 +286,7 @@ export async function getPTablePopulation({
       return json.data && json.data.length > 0;
     } catch (err) {
       console.warn(
-        `Batch query failed on ${providerUrl}: [${syms.join(", ")}]`
+        `Batch query failed on ${providerUrl}: [${syms.join(", ")}]`,
       );
       return false;
     }
@@ -299,8 +320,8 @@ export async function getPTablePopulation({
       (endTime - startTime) /
       1000
     ).toFixed(
-      2
-    )} seconds \n====== URL ${providerUrl} finished batch searches. ======\n`
+      2,
+    )} seconds \n====== URL ${providerUrl} finished batch searches. ======\n`,
   );
 
   const elementMap = elements.reduce((acc, e) => {

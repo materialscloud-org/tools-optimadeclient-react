@@ -1,5 +1,10 @@
 export const corsProxies = [
   {
+    name: "allorigins",
+    urlRule: (targetUrl) =>
+      `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
+  },
+  {
     name: "cors-optimade-science",
     urlRule: (targetUrl) => {
       const match = targetUrl.match(/^https?:\/\/(.+)$/);
@@ -11,10 +16,5 @@ export const corsProxies = [
   {
     name: "cors-anywhere",
     urlRule: (targetUrl) => `https://cors-anywhere.com/${targetUrl}`,
-  },
-  {
-    name: "allorigins",
-    urlRule: (targetUrl) =>
-      `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`,
   },
 ];
