@@ -7,7 +7,7 @@ import { ResultViewer } from "./ResultViewer";
 import ResultsDropdown from "./ResultsDropdown";
 import OptimadeProviderInfo from "./OptimadeProviderInfo";
 import { PaginationHandler } from "./PaginationHandler";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import OptimadeNoResults from "./OptimadeNoResults";
 import MaterialsCloudHeader from "mc-react-header";
 import OptimadeChildInfo from "./OptimadeChildInfo";

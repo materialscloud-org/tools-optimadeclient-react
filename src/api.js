@@ -2,7 +2,30 @@ import { corsProxies } from "./corsProxies.js";
 
 import { elements } from "./components/OptimadeClient/OptimadeFilters/OptimadePTable/elements.js";
 
+async function fetchWithCorsFallback(url) {
+  const attempts = [
+    { name: "direct", url },
+    ...corsProxies.map((proxy) => ({
+      name: proxy.name,
+      url: proxy.urlRule(url),
+    })),
+  ];
+
+  for (const { url: attemptUrl } of attempts) {
+    try {
+      const res = await fetch(attemptUrl);
+      if (!res.ok) continue;
+      return await res.json();
+    } catch {
+      continue;
+    }
+  }
+
+  throw new Error("All fetch attempts failed");
+}
+
 // --- Providers list ---
+// go to optimade url, if that fails use the fallback here.
 export async function getProvidersList(
   providersUrl = "https://raw.githubusercontent.com/Materials-Consortia/providers/refs/heads/master/src/links/v1/providers.json",
   excludeIds = [],
@@ -35,88 +58,48 @@ export async function getProvidersList(
 
 // --- Provider links ---
 export async function getProviderLinks(baseUrl) {
-  const extractChildren = (json) =>
-    (json.data || []).filter((d) => d.attributes?.link_type === "child");
+  try {
+    const json = await fetchWithCorsFallback(`${baseUrl}/v1/links`);
 
-  const attempts = [
-    { name: "direct", url: `${baseUrl}/v1/links` },
-    ...corsProxies.map((proxy) => ({
-      name: proxy.name,
-      url: proxy.urlRule(`${baseUrl}/v1/links`),
-    })),
-  ];
+    const children = (json.data || []).filter(
+      (d) => d.attributes?.link_type === "child",
+    );
 
-  for (const { url, name } of attempts) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) continue;
-      const json = await res.json();
-      return { children: extractChildren(json), error: null };
-    } catch {
-      continue;
-    }
+    return { children, error: null };
+  } catch (err) {
+    return { children: [], error: err };
   }
-
-  return { children: [], error: new Error("All fetch attempts failed") };
 }
 
 // --- Custom info fetch subdatabase info ---
 export async function getCustomInfo({ baseUrl }) {
-  const attempts = [
-    { name: "direct", url: `${baseUrl}/info/` },
-    ...corsProxies.map((proxy) => ({
-      name: proxy.name,
-      url: proxy.urlRule(`${baseUrl}/info/`),
-    })),
-  ];
-
-  for (const { url, name } of attempts) {
-    try {
-      console.log("fetching via url", url);
-      const res = await fetch(url);
-      if (!res.ok) continue;
-
-      const json = await res.json();
-
-      return { meta: json.meta ?? {} };
-    } catch {
-      continue;
-    }
+  try {
+    const json = await fetchWithCorsFallback(`${baseUrl}/info/`);
+    return { meta: json.meta ?? {} };
+  } catch {
+    return { meta: {} };
   }
 }
 
 // --- Provider structure info ---
 export async function getInfo({ providerUrl }) {
-  const attempts = [
-    { name: "direct", url: `${providerUrl}/v1/info/structures` },
-  ];
+  try {
+    const json = await fetchWithCorsFallback(`${providerUrl}/info/structures`);
 
-  for (const { url, name } of attempts) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) continue;
+    const allProps = json.data?.properties ?? {};
+    const customProps = Object.fromEntries(
+      Object.entries(allProps).filter(([key]) => key.startsWith("_")),
+    );
 
-      const json = await res.json();
-      const filteredProps = Object.fromEntries(
-        Object.entries(json.data.properties || {}).filter(([key]) =>
-          key.startsWith("_"),
-        ),
-      );
-
-      return {
-        customProps: filteredProps,
-        error: null,
-        allProps: json.data.properties,
-      };
-    } catch {
-      continue;
-    }
+    return { customProps, allProps, error: null };
+  } catch (err) {
+    return { customProps: {}, allProps: {}, error: err };
   }
-
-  return { customProps: {}, error: new Error("All fetch attempts failed") };
 }
 
-// --- Provider structures ---
+/* --- Provider structures ---
+  Does some clever determination of what fields are missing and fetches those and merges in a second query.
+*/
 export async function getStructures({
   providerUrl,
   filter = "",
@@ -124,16 +107,6 @@ export async function getStructures({
   pageSize = 20,
 }) {
   if (!providerUrl) throw new Error("Provider URL is required");
-
-  // We refetch the info here even though its already been fetched. This is a very clear area of inefficiency
-  let allFields = [];
-  try {
-    const { customProps, error, allProps } = await getInfo({ providerUrl });
-    if (error) console.warn("Could not fetch custom fields:", error);
-    if (allProps) allFields = Object.keys(allProps);
-  } catch (err) {
-    console.warn("Error fetching custom fields:", err);
-  }
 
   const preferredFields = [
     "cartesian_site_positions",
@@ -143,39 +116,66 @@ export async function getStructures({
     "chemical_formula_hill",
   ];
 
-  const mergedFields = Array.from(new Set([...preferredFields, ...allFields]));
-
   const offset = (page - 1) * pageSize;
-  const queryString = filter
+
+  const baseQuery = filter
     ? `?filter=${encodeURIComponent(filter)}&page_offset=${offset}`
     : `?page_offset=${offset}`;
 
-  // 4. Build URL with dynamic response_fields
-  const urlWithFields = `${providerUrl}/v1/structures${queryString}&response_fields=${mergedFields.join(
-    ",",
-  )}`;
+  const baseUrl = `${providerUrl}/v1/structures${baseQuery}`;
 
-  const attempts = [
-    { name: "direct", url: urlWithFields },
-    ...corsProxies.map((proxy) => ({
-      name: proxy.name,
-      url: proxy.urlRule(urlWithFields),
-    })),
-  ];
-
-  for (const { url } of attempts) {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) continue;
-      return await res.json();
-    } catch {
-      continue;
-    }
+  // --- 1. base fetch (no response_fields) ---
+  let baseData;
+  try {
+    baseData = await fetchWithCorsFallback(baseUrl, corsProxies);
+  } catch (err) {
+    throw new Error("Failed to fetch base structures");
   }
 
-  throw new Error("All fetch attempts failed for getStructures");
+  const structures = baseData?.data ?? [];
+  if (!structures.length) return baseData;
+
+  // --- 2. detect missing preferred fields ---
+  const sampleAttrs = structures[0].attributes ?? {};
+  const availableFields = new Set(Object.keys(sampleAttrs));
+
+  const missingFields = preferredFields.filter((f) => !availableFields.has(f));
+
+  if (!missingFields.length) {
+    return baseData;
+  }
+
+  // --- 3. fetch missing fields only ---
+  const fieldsUrl =
+    `${providerUrl}/v1/structures` +
+    `${baseQuery}&response_fields=${missingFields.join(",")}`;
+
+  let fieldsData;
+  try {
+    fieldsData = await fetchWithCorsFallback(fieldsUrl, corsProxies);
+  } catch (err) {
+    console.warn("Failed to fetch missing fields, returning base response");
+    return baseData;
+  }
+
+  // --- 4. merge by id ---
+  const extraById = new Map(
+    (fieldsData.data ?? []).map((s) => [s.id, s.attributes ?? {}]),
+  );
+
+  return {
+    ...baseData,
+    data: structures.map((s) => ({
+      ...s,
+      attributes: {
+        ...s.attributes,
+        ...(extraById.get(s.id) ?? {}),
+      },
+    })),
+  };
 }
 
+// the following are only invoked as scripts and thus do not need cors.
 export async function getElementsCount({ providerUrl }) {
   const start = performance.now();
 
