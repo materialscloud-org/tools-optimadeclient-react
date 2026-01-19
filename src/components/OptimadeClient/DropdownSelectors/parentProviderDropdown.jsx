@@ -22,7 +22,7 @@ export default function ParentProviderDropdown({
           onSelectProvider({ id: "__custom__", attributes: { base_url: "" } });
         } else {
           const selected = providers.find(
-            (p) => p.attributes?.base_url === val
+            (p) => p.attributes?.base_url === val,
           );
           onSelectProvider(selected || null);
         }

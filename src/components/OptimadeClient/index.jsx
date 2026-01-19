@@ -22,25 +22,23 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
   const [searchParams, setSearchParams] = useSearchParams();
   const [providers, setProviders] = useState([]);
 
-  const customProvider = searchParams.has("custom");
   const customUrl = searchParams.get("custom_url");
 
   // set selectedProvider when URL search params is in the custom state
   const [selectedProvider, setSelectedProvider] = useState(
-    customProvider ? { id: "__custom__", base_url: "" } : null
+    customUrl ? { id: "__custom__", base_url: "" } : null,
   );
 
   // set selectedChild when URL search params is in the custom state
   const [selectedChild, setSelectedChild] = useState(
-    customUrl ? { id: "__custom__", base_url: customUrl } : null
+    customUrl ? { id: "__custom__", base_url: customUrl } : null,
   );
 
   // remove search params when selected child is not in the custom state
   useEffect(() => {
     if (!selectedProvider || selectedProvider.id !== "__custom__") {
-      if (searchParams.has("custom")) {
+      if (searchParams.has("custom_url")) {
         const next = new URLSearchParams(searchParams);
-        next.delete("custom");
         next.delete("custom_url");
         setSearchParams(next, { replace: true });
       }
@@ -52,10 +50,8 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
     const next = new URLSearchParams(searchParams);
 
     if (selectedChild?.id === "__custom__" && selectedChild.base_url) {
-      next.set("custom", "");
       next.set("custom_url", selectedChild.base_url);
     } else {
-      next.delete("custom");
       next.delete("custom_url");
     }
 
@@ -103,7 +99,7 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
       setTotalPages(
         meta.data_returned != null
           ? Math.max(1, Math.ceil(meta.data_returned / 20))
-          : "N/A"
+          : "N/A",
       );
 
       setCurrentResult(data?.data[0] || null);
