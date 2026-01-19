@@ -70,6 +70,11 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
   });
   const [totalPages, setTotalPages] = useState(1);
 
+  // reset to page one when child changes.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedChild]);
+
   useEffect(() => {
     const loadProviders = async () => {
       try {
@@ -162,26 +167,23 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
 
           {/* Filters */}
           <div className="p-2 w-full">
-            {selectedChild?.base_url && (
-              <AnimatePresence>
-                <motion.div
-                  key="filters"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className={containerStyle}
-                >
-                  <OptimadeFilters
-                    queryUrl={selectedChild?.base_url}
-                    onSubmit={(filter) => {
-                      setCurrentFilter(filter);
-                      setCurrentPage(1);
-                    }}
-                  />
-                </motion.div>
-              </AnimatePresence>
-            )}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{
+                opacity: selectedChild?.base_url ? 1 : 0,
+                y: selectedChild?.base_url ? 0 : 20,
+              }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              className={`${containerStyle} ${!selectedChild?.base_url ? "pointer-events-none" : ""}`}
+            >
+              <OptimadeFilters
+                queryUrl={selectedChild?.base_url || ""}
+                onSubmit={(filter) => {
+                  setCurrentFilter(filter);
+                  setCurrentPage(1);
+                }}
+              />
+            </motion.div>
           </div>
 
           <div className="p-2 w-full">

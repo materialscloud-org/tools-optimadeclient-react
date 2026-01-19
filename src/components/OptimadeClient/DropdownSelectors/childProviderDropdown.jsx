@@ -31,7 +31,7 @@ export default function ChildProviderDropdown({
       try {
         setLoadingChildren(true);
         const { children } = await getProviderLinks(
-          selectedProvider.attributes.base_url
+          selectedProvider.attributes.base_url,
         );
         const entries = children.map((c) => ({
           id: c.id,
@@ -61,7 +61,17 @@ export default function ChildProviderDropdown({
   // Render custom input with submit button
   if (selectedProvider.id === "__custom__") {
     return (
-      <div className="flex gap-2 items-center">
+      <form
+        className="flex gap-2 items-center"
+        onSubmit={(e) => {
+          e.preventDefault(); // prevent page reload
+          onSelectChild({
+            id: "__custom__",
+            name: "Custom Endpoint",
+            base_url: customInput,
+          });
+        }}
+      >
         <input
           type="text"
           placeholder="Enter custom endpoint URL"
@@ -71,17 +81,11 @@ export default function ChildProviderDropdown({
         />
         <button
           className={`${baseButtonStyle} rounded-sm md:py-1!`}
-          onClick={() =>
-            onSelectChild({
-              id: "__custom__",
-              name: "Custom Endpoint",
-              base_url: customInput,
-            })
-          }
+          type="submit"
         >
           Submit
         </button>
-      </div>
+      </form>
     );
   }
 
