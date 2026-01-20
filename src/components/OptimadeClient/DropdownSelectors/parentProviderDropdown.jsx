@@ -5,7 +5,6 @@ export default function ParentProviderDropdown({
   selectedProvider,
   onSelectProvider,
 }) {
-  // derive the select value
   const selectValue = selectedProvider
     ? selectedProvider.id === "__custom__"
       ? "__custom__"

@@ -1,5 +1,4 @@
-import { useState, useEffect } from "react";
-
+import { useState, useEffect, useRef } from "react";
 import { getProviderLinks } from "../../../api";
 import { longSlateDropdown } from "../../../styles/dropdownStyles";
 import { baseButtonStyle } from "../../../styles/buttonStyles";
@@ -11,7 +10,11 @@ export default function ChildProviderDropdown({
   selectedChild,
   onSelectChild,
 }) {
-  const [customInput, setCustomInput] = useState(selectedChild?.base_url || "");
+  const [customInput, setCustomInput] = useState(
+    selectedChild?.id === "__custom__" ? selectedChild.base_url : "",
+  );
+
+  const lastSubmittedCustom = useRef(customInput);
 
   const { data, isLoading: loadingChildren } = useQuery({
     queryKey: ["provider-links", selectedProvider?.attributes?.base_url],
@@ -27,23 +30,52 @@ export default function ChildProviderDropdown({
     })) ?? [];
 
   useEffect(() => {
-    if (!selectedProvider) {
-      onSelectChild(null);
-      return;
+    if (!selectedProvider || selectedProvider.id === "__custom__") return;
+    if (loadingChildren) return;
+
+    if (childEntries.length === 1) {
+      if (!selectedChild || selectedChild.id !== childEntries[0].id) {
+        onSelectChild(childEntries[0]);
+      }
+    } else if (childEntries.length > 1) {
+      if (
+        selectedChild &&
+        !childEntries.find((c) => c.id === selectedChild.id)
+      ) {
+        onSelectChild(null);
+      }
+    } else {
+      if (selectedChild !== null) onSelectChild(null);
     }
+  }, [
+    selectedProvider,
+    childEntries,
+    loadingChildren,
+    selectedChild,
+    onSelectChild,
+  ]);
+
+  // Auto-submit the last custom URL if switching back to custom
+  useEffect(() => {
+    if (!selectedProvider) return;
 
     if (selectedProvider.id === "__custom__") {
-      onSelectChild({
-        id: "__custom__",
-        name: "Custom Endpoint",
-        base_url: customInput,
-      });
+      // Only submit if selectedChild is not the current custom input
+      if (
+        !selectedChild ||
+        selectedChild.base_url !== lastSubmittedCustom.current
+      ) {
+        onSelectChild({
+          id: "__custom__",
+          name: "Custom Endpoint",
+          base_url: lastSubmittedCustom.current,
+        });
+        setCustomInput(lastSubmittedCustom.current);
+      }
     }
-  }, [selectedProvider, onSelectChild]);
+  }, [selectedProvider, selectedChild, onSelectChild]);
 
-  if (!selectedProvider) {
-    return <></>;
-  }
+  if (!selectedProvider) return null;
 
   // Render custom input with submit button
   if (selectedProvider.id === "__custom__") {
@@ -51,12 +83,14 @@ export default function ChildProviderDropdown({
       <form
         className="flex gap-2 items-center"
         onSubmit={(e) => {
-          e.preventDefault(); // prevent page reload
-          onSelectChild({
+          e.preventDefault();
+          const newChild = {
             id: "__custom__",
             name: "Custom Endpoint",
             base_url: customInput,
-          });
+          };
+          lastSubmittedCustom.current = customInput; // save submitted value
+          onSelectChild(newChild);
         }}
       >
         <input
