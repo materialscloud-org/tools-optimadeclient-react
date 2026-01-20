@@ -17,24 +17,24 @@ import { containerStyle } from "../../styles/containerStyles";
 import ParentProviderDropdown from "./DropdownSelectors/parentProviderDropdown";
 import ChildProviderDropdown from "./DropdownSelectors/childProviderDropdown";
 import { useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [providers, setProviders] = useState([]);
-
   const customUrl = searchParams.get("base_url");
 
-  // set selectedProvider when URL search params is in the custom state
   const [selectedProvider, setSelectedProvider] = useState(
     customUrl ? { id: "__custom__", base_url: "" } : null,
   );
-
-  // set selectedChild when URL search params is in the custom state
   const [selectedChild, setSelectedChild] = useState(
     customUrl ? { id: "__custom__", base_url: customUrl } : null,
   );
 
-  // remove search params when selected child is not in the custom state
+  const [currentFilter, setCurrentFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [currentResult, setCurrentResult] = useState(null);
+
+  // Handle URL search params for custom endpoints
   useEffect(() => {
     if (!selectedProvider || selectedProvider.id !== "__custom__") {
       if (searchParams.has("base_url")) {
@@ -45,7 +45,6 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
     }
   }, [selectedProvider]);
 
-  // add URL search params when selectedChild is in the custom state
   useEffect(() => {
     const next = new URLSearchParams(searchParams);
 
@@ -58,67 +57,50 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
     setSearchParams(next, { replace: true });
   }, [selectedChild]);
 
-  // filter and pages useStates
-  const [currentFilter, setCurrentFilter] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [results, setResults] = useState(null);
-  const [currentResult, setCurrentResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [metaData, setMetaData] = useState({
-    data_returned: 0,
-    data_available: 0,
-  });
-  const [totalPages, setTotalPages] = useState(1);
-
-  // reset to page one when child changes.
+  // Reset page to 1 whenever child changes
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedChild]);
 
-  useEffect(() => {
-    const loadProviders = async () => {
-      try {
-        const provObj = await getProvidersList(undefined, hideProviderList);
-        setProviders(provObj.data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    loadProviders();
-  }, []);
+  // --- Providers list via TanStack Query ---
+  const { data: providersData } = useQuery({
+    queryKey: ["providers", hideProviderList],
+    queryFn: () => getProvidersList(undefined, hideProviderList),
+    staleTime: Infinity,
+  });
 
-  const fetchResults = useCallback(async () => {
-    if (!selectedChild?.base_url) return;
+  const providers = providersData?.data ?? [];
 
-    setLoading(true);
-    try {
-      const data = await getStructures({
+  // --- Structures / results via TanStack Query ---
+  const { data: resultsData, isLoading: isLoading } = useQuery({
+    queryKey: [
+      "structures",
+      selectedChild?.base_url,
+      currentFilter,
+      currentPage,
+    ],
+    queryFn: () =>
+      getStructures({
         providerUrl: selectedChild?.base_url,
         filter: currentFilter,
         page: currentPage,
-      });
-      setResults(data);
+      }),
+    enabled: !!selectedChild?.base_url,
+    staleTime: 2 * 60 * 1000,
+    keepPreviousData: true, // keeps previous page visible while fetching new page
+  });
 
-      const meta = data?.meta ?? { data_returned: 0, data_available: 0 };
-      setMetaData(meta);
-      setTotalPages(
-        meta.data_returned != null
-          ? Math.max(1, Math.ceil(meta.data_returned / 20))
-          : "N/A",
-      );
+  const results = resultsData?.data ?? [];
+  const metaData = resultsData?.meta ?? { data_returned: 0, data_available: 0 };
+  const totalPages =
+    metaData.data_returned != null
+      ? Math.max(1, Math.ceil(metaData.data_returned / 20))
+      : 1;
 
-      setCurrentResult(data?.data[0] || null);
-    } catch (err) {
-      console.error(err);
-      setCurrentResult(null);
-    } finally {
-      setLoading(false);
-    }
-  }, [selectedChild, currentFilter, currentPage]);
-
+  // Reset selectedResult when results change
   useEffect(() => {
-    fetchResults();
-  }, [fetchResults]);
+    setCurrentResult(results[0] ?? null);
+  }, [results]);
 
   return (
     <>
@@ -192,16 +174,11 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
 
           {/* Results */}
           {selectedChild?.base_url && (
-            <div className="px-2 md:px-4 w-full">
-              {loading && (
-                <div className="flex justify-center items-center h-[610px]">
-                  <div className="w-16 h-16 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
-                </div>
-              )}
+            <div className="px-2 md:px-4 w-full min-h-[726px] md:min-h-[621px] relative">
+              <div className="border-b border-slate-300 py-2" />
 
-              <div className="border-b border-slate-300 py-2"></div>
-
-              {!loading && !currentResult && currentFilter && (
+              {/* No results message */}
+              {!isLoading && !currentResult && currentFilter && (
                 <div className="p-2">
                   <OptimadeNoResults
                     queryUrl={selectedChild?.base_url}
@@ -210,13 +187,20 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
                 </div>
               )}
 
-              {!loading && results && currentResult && (
-                <div className="py-1 md:py-2">
+              {/* Spinner overlay */}
+              {isLoading && (
+                <div className="absolute inset-0 flex justify-center items-center bg-white/70 z-1000">
+                  <div className="w-16 h-16 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin" />
+                </div>
+              )}
+
+              {/* Results + dropdown + pagination */}
+              {results.length > 0 && currentResult && (
+                <div className="relative py-1 md:py-2">
                   <div className="flex flex-col md:flex-row items-stretch md:items-end gap-4">
                     <div className="flex-1">
                       <ResultsDropdown
                         results={results}
-                        resultsLoading={loading}
                         selectedResult={currentResult}
                         setSelectedResult={setCurrentResult}
                       />
@@ -225,7 +209,6 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
                       <PaginationHandler
                         currentPage={currentPage}
                         totalPages={totalPages}
-                        resultsLoading={loading}
                         metaData={metaData}
                         onPageChange={setCurrentPage}
                       />

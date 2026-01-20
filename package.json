@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tanstack/react-query": "^5.90.19",
     "framer-motion": "^12.23.19",
     "gl-matrix": "^3.4.4",
     "lodash.debounce": "^4.0.8",

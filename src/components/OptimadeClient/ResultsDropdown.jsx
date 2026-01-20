@@ -2,12 +2,11 @@ import { slateDropdown } from "../../styles/dropdownStyles";
 
 export default function ResultsDropdown({
   results,
-  resultsLoading,
   selectedResult,
   setSelectedResult,
 }) {
   const handleChange = (e) => {
-    const chosen = results?.data?.find((r) => String(r.id) === e.target.value);
+    const chosen = results?.find((r) => String(r.id) === e.target.value);
     if (chosen) setSelectedResult(chosen);
   };
 
@@ -20,12 +19,12 @@ export default function ResultsDropdown({
         className={`${slateDropdown} w-full`}
         value={selectedResult?.id || ""}
         onChange={handleChange}
-        disabled={resultsLoading || !results?.data?.length}
+        disabled={!results?.length}
       >
-        {!results?.data?.length ? (
+        {!results?.length ? (
           <option value="">No results for current query</option>
         ) : (
-          results.data.map((result) => (
+          results.map((result) => (
             <option key={result.id} value={result.id}>
               {`${
                 result.attributes?.chemical_formula_descriptive ||

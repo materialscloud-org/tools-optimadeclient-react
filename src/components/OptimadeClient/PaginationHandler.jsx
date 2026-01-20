@@ -6,7 +6,6 @@ const buttonClassName =
 export function PaginationHandler({
   currentPage,
   totalPages,
-  resultsLoading,
   metaData,
   onPageChange,
 }) {
@@ -32,28 +31,28 @@ export function PaginationHandler({
 
       <button
         onClick={() => onPageChange(1)}
-        disabled={currentPage === 1 || resultsLoading}
+        disabled={currentPage === 1}
         className={buttonClassName}
       >
         <FirstIcon />
       </button>
       <button
         onClick={() => onPageChange(currentPage - 1)}
-        disabled={!hasPrev || resultsLoading}
+        disabled={!hasPrev}
         className={buttonClassName}
       >
         <PreviousIcon />
       </button>
       <button
         onClick={() => onPageChange(currentPage + 1)}
-        disabled={!hasNext || resultsLoading}
+        disabled={!hasNext}
         className={buttonClassName}
       >
         <NextIcon />
       </button>
       <button
         onClick={() => onPageChange(totalPages)}
-        disabled={currentPage === totalPages || resultsLoading}
+        disabled={currentPage === totalPages}
         className={buttonClassName}
       >
         <LastIcon />
