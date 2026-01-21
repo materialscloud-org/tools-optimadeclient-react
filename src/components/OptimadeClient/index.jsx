@@ -27,6 +27,7 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
   const dbParam = searchParams.get("db");
 
   const isCustom = !!customUrl;
+  const lastUrlRef = useRef("");
 
   const [selectedProvider, setSelectedProvider] = useState(
     isCustom ? { id: "__custom__", base_url: "" } : null,
@@ -70,73 +71,73 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
   // --- 1. URL → Provider State ---
   useEffect(() => {
     if (isCustom || !providers.length || !providerParam) return;
-
     const provider = providers.find((p) => p.id === providerParam);
-    if (provider && selectedProvider?.id !== provider.id) {
-      setSelectedProvider(provider);
-    }
+    if (provider) setSelectedProvider(provider);
   }, [providers, providerParam, isCustom]);
 
-  // --- 2. URL → Child State ---
   useEffect(() => {
     if (isCustom || !dbParam || !childEntries.length) return;
-
-    if (selectedChild?.id !== dbParam) {
+    if (!selectedChild) {
       const child = childEntries.find((c) => c.id === dbParam);
-      if (child) {
-        setSelectedChild(child);
-      }
+      if (child) setSelectedChild(child);
     }
-  }, [childEntries, dbParam, isCustom]);
+  }, [childEntries, dbParam, isCustom, !!selectedChild]);
 
-  // 1. Add a ref at the top of your component to track the "in-flight" URL
-  const lastUrlRef = useRef("");
-
-  // 2. Update the Effect
   useEffect(() => {
-    const isCurrentlyCustom =
-      selectedProvider?.id === "__custom__" ||
-      selectedChild?.id === "__custom__";
+    const isCurrentlyCustom = selectedProvider?.id === "__custom__";
     const nextParams = new URLSearchParams();
 
     if (isCurrentlyCustom) {
       const urlToSet = selectedChild?.base_url || customUrl;
       if (urlToSet) nextParams.set("base_url", urlToSet);
     } else {
-      if (selectedProvider?.id) nextParams.set("provider", selectedProvider.id);
+      if (selectedProvider?.id) {
+        nextParams.set("provider", selectedProvider.id);
 
-      // Persist dbParam if child is still loading/null
-      if (selectedChild?.id && selectedChild.id !== "__custom__") {
-        nextParams.set("db", selectedChild.id);
-      } else if (dbParam && !selectedChild && selectedProvider) {
-        nextParams.set("db", dbParam);
+        // Only set DB if it actually belongs to the selected provider
+        if (selectedChild?.id && selectedChild.id !== "__custom__") {
+          nextParams.set("db", selectedChild.id);
+        } else if (dbParam && !selectedChild) {
+          // Carry over the URL param while loading
+          nextParams.set("db", dbParam);
+        }
       }
     }
 
     nextParams.sort();
     const nextString = nextParams.toString();
 
-    // --- STABILITY CHECKS ---
-    // A. Check against the current browser URL
-    const currentParams = new URLSearchParams(searchParams);
-    currentParams.sort();
-    const currentString = currentParams.toString();
+    const currentString = new URLSearchParams(
+      window.location.search,
+    ).toString();
 
-    // B. Check against the last string we successfully pushed (Ref)
-    // C. Only update if it's actually different AND not an empty reset loop
     if (nextString !== currentString && nextString !== lastUrlRef.current) {
-      lastUrlRef.current = nextString; // Update ref immediately
+      lastUrlRef.current = nextString;
       setSearchParams(nextParams, { replace: true });
     }
   }, [
     selectedProvider?.id,
     selectedChild?.id,
     selectedChild?.base_url,
-    customUrl,
-    dbParam,
-    setSearchParams,
-    searchParams,
+    isCustom,
   ]);
+
+  // --- 3. Handlers for Dropdowns ---
+  const handleProviderChange = (provider) => {
+    if (provider?.id !== selectedProvider?.id) {
+      setSelectedProvider(provider);
+      setSelectedChild(null); // Clear child when provider changes
+
+      // If switching to custom, initialize
+      if (provider?.id === "__custom__") {
+        setSelectedChild({ id: "__custom__", base_url: customUrl || "" });
+      }
+    }
+  };
+
+  const handleChildChange = (child) => {
+    setSelectedChild(child);
+  };
 
   // --- Structures / results via TanStack Query ---
   const { data: resultsData, isLoading: isLoading } = useQuery({
@@ -192,26 +193,32 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
             <ParentProviderDropdown
               providers={providers}
               selectedProvider={selectedProvider}
-              onSelectProvider={setSelectedProvider}
+              onSelectProvider={handleProviderChange}
             />
             <ChildProviderDropdown
               selectedProvider={selectedProvider}
               selectedChild={selectedChild}
-              onSelectChild={setSelectedChild}
+              onSelectChild={handleChildChange}
               childEntries={childEntries}
               loadingChildren={loadingChildren}
             />
           </div>
 
           {/* Info panels */}
-          <div className="flex flex-col md:flex-row w-full max-w-5xl px-2 md:px-4 py-2 gap-4">
-            <div className="md:w-1/2 w-full">
-              <OptimadeParentInfo
-                provider={selectedProvider}
-                providers={providers}
-              />
-            </div>
-            <div className="md:w-1/2 w-full">
+          <div
+            className={`flex flex-col md:flex-row w-full max-w-5xl px-2 md:px-4 py-2 gap-4 ${selectedProvider?.id === "__custom__" ? "justify-center" : ""}`}
+          >
+            {selectedProvider?.id != "__custom__" && (
+              <div className="md:w-1/2 w-full">
+                <OptimadeParentInfo
+                  provider={selectedProvider}
+                  providers={providers}
+                />
+              </div>
+            )}
+            <div
+              className={`w-full ${selectedProvider?.id === "__custom__" ? "md:w-2/3 lg:w-1/2" : "md:w-1/2"}`}
+            >
               <OptimadeChildInfo child={selectedChild} />
             </div>
           </div>

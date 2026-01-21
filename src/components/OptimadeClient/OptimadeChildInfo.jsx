@@ -42,7 +42,9 @@ export default function OptimadeChildInfo({ child }) {
 
   return (
     <div className={`${containerStyle} ${textTiny} h-35 overflow-auto`}>
-      <h3 className={`${textNormal} pb-1.5`}>{name}</h3>
+      <h3
+        className={`${textNormal} pb-1.5`}
+      >{`Provider information: ${name}`}</h3>
       {description && <p className="pb-1">{description}</p>}
       {homepage && (
         <p>

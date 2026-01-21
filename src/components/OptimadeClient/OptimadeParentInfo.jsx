@@ -44,12 +44,12 @@ export default function OptimadeParentInfo({ provider, providers }) {
         <p>
           Index metadb:{" "}
           <a
-            href={`${base_url}/links`}
+            href={`${base_url}/v1/links`}
             target="_blank"
             rel="noopener noreferrer"
             className={textHyperlink}
           >
-            {`${base_url}/links`}
+            {`${base_url}/v1/links`}
           </a>
         </p>
       )}
