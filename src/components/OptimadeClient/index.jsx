@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { getProvidersList, getProviderLinks, getStructures } from "../../api";
 import OptimadeHeader from "./OptimadeHeader";
 import OptimadeFilters from "./OptimadeFilters";
@@ -89,47 +89,53 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
     }
   }, [childEntries, dbParam, isCustom]);
 
-  // --- state → URL ---
-  useEffect(() => {
-    // 1. Determine if we are in Custom Mode
-    const isCurrentlyCustom = selectedChild?.id === "__custom__";
+  // 1. Add a ref at the top of your component to track the "in-flight" URL
+  const lastUrlRef = useRef("");
 
-    const params = new URLSearchParams();
+  // 2. Update the Effect
+  useEffect(() => {
+    const isCurrentlyCustom =
+      selectedProvider?.id === "__custom__" ||
+      selectedChild?.id === "__custom__";
+    const nextParams = new URLSearchParams();
 
     if (isCurrentlyCustom) {
-      // Only set base_url, ignore provider/db
-      if (selectedChild?.base_url) {
-        params.set("base_url", selectedChild.base_url);
-      } else if (customUrl) {
-        // Keep existing URL param if state hasn't updated yet
-        params.set("base_url", customUrl);
-      }
+      const urlToSet = selectedChild?.base_url || customUrl;
+      if (urlToSet) nextParams.set("base_url", urlToSet);
     } else {
-      // --- REGISTRY MODE ---
-      if (selectedProvider?.id) {
-        params.set("provider", selectedProvider.id);
-      }
+      if (selectedProvider?.id) nextParams.set("provider", selectedProvider.id);
 
+      // Persist dbParam if child is still loading/null
       if (selectedChild?.id && selectedChild.id !== "__custom__") {
-        params.set("db", selectedChild.id);
+        nextParams.set("db", selectedChild.id);
       } else if (dbParam && !selectedChild && selectedProvider) {
-        // PERSIST the db param from URL while the provider's children are loading
-        params.set("db", dbParam);
+        nextParams.set("db", dbParam);
       }
     }
 
-    // prevent loops by comparing old to new
-    const newString = params.toString();
-    if (newString !== searchParams.toString() && newString !== "") {
-      setSearchParams(params, { replace: true });
+    nextParams.sort();
+    const nextString = nextParams.toString();
+
+    // --- STABILITY CHECKS ---
+    // A. Check against the current browser URL
+    const currentParams = new URLSearchParams(searchParams);
+    currentParams.sort();
+    const currentString = currentParams.toString();
+
+    // B. Check against the last string we successfully pushed (Ref)
+    // C. Only update if it's actually different AND not an empty reset loop
+    if (nextString !== currentString && nextString !== lastUrlRef.current) {
+      lastUrlRef.current = nextString; // Update ref immediately
+      setSearchParams(nextParams, { replace: true });
     }
   }, [
-    selectedProvider,
-    selectedChild,
-    isCustom,
+    selectedProvider?.id,
+    selectedChild?.id,
+    selectedChild?.base_url,
     customUrl,
     dbParam,
     setSearchParams,
+    searchParams,
   ]);
 
   // --- Structures / results via TanStack Query ---
