@@ -75,9 +75,12 @@ export async function getProviderLinks(baseUrl) {
 export async function getCustomInfo({ baseUrl }) {
   try {
     const json = await fetchWithCorsFallback(`${baseUrl}/info/`);
-    return { meta: json.meta ?? {} };
-  } catch {
-    return { meta: {} };
+    if (!json || !json.meta) {
+      throw new Error("Invalid OPTIMADE response");
+    }
+    return { meta: json.meta };
+  } catch (error) {
+    throw error;
   }
 }
 
