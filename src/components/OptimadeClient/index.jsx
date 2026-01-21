@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { getProvidersList, getStructures } from "../../api";
+import { getProvidersList, getProviderLinks, getStructures } from "../../api";
 import OptimadeHeader from "./OptimadeHeader";
 import OptimadeFilters from "./OptimadeFilters";
 import OptimadeFAQs from "./OptimadeFAQs";
@@ -53,51 +53,84 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
 
   const providers = providersData?.data ?? [];
 
-  // --- URL → state (registry mode only) ---
+  // --- Children from providers list ---
+  const { data: childData, isLoading: loadingChildren } = useQuery({
+    queryKey: ["provider-links", selectedProvider?.attributes?.base_url],
+    queryFn: () => getProviderLinks(selectedProvider.attributes.base_url),
+    enabled: !!selectedProvider?.attributes?.base_url,
+    staleTime: Infinity,
+  });
+
+  const childEntries =
+    childData?.children?.map((c) => ({
+      id: c.id,
+      ...(c.attributes ?? {}),
+    })) ?? [];
+
+  // --- 1. URL → Provider State ---
   useEffect(() => {
-    if (isCustom) return;
-    if (!providers.length || !providerParam) return;
+    if (isCustom || !providers.length || !providerParam) return;
 
     const provider = providers.find((p) => p.id === providerParam);
-    if (provider) setSelectedProvider(provider);
+    if (provider && selectedProvider?.id !== provider.id) {
+      setSelectedProvider(provider);
+    }
   }, [providers, providerParam, isCustom]);
 
+  // --- 2. URL → Child State ---
   useEffect(() => {
-    if (isCustom) return;
-    if (!selectedProvider || !dbParam) return;
+    if (isCustom || !dbParam || !childEntries.length) return;
 
-    const child = selectedProvider.children?.find((c) => c.id === dbParam);
-    if (child) setSelectedChild(child);
-  }, [selectedProvider, dbParam, isCustom]);
+    if (selectedChild?.id !== dbParam) {
+      const child = childEntries.find((c) => c.id === dbParam);
+      if (child) {
+        setSelectedChild(child);
+      }
+    }
+  }, [childEntries, dbParam, isCustom]);
 
   // --- state → URL ---
   useEffect(() => {
-    // --- CUSTOM MODE ---
-    if (selectedChild?.id === "__custom__" && selectedChild.base_url) {
-      setSearchParams({ base_url: selectedChild.base_url }, { replace: true });
-      return;
+    // 1. Determine if we are in Custom Mode
+    const isCurrentlyCustom = selectedChild?.id === "__custom__";
+
+    const params = new URLSearchParams();
+
+    if (isCurrentlyCustom) {
+      // Only set base_url, ignore provider/db
+      if (selectedChild?.base_url) {
+        params.set("base_url", selectedChild.base_url);
+      } else if (customUrl) {
+        // Keep existing URL param if state hasn't updated yet
+        params.set("base_url", customUrl);
+      }
+    } else {
+      // --- REGISTRY MODE ---
+      if (selectedProvider?.id) {
+        params.set("provider", selectedProvider.id);
+      }
+
+      if (selectedChild?.id && selectedChild.id !== "__custom__") {
+        params.set("db", selectedChild.id);
+      } else if (dbParam && !selectedChild && selectedProvider) {
+        // PERSIST the db param from URL while the provider's children are loading
+        params.set("db", dbParam);
+      }
     }
 
-    // --- REGISTRY MODE ---
-    if (selectedProvider?.id && selectedChild?.id) {
-      setSearchParams(
-        {
-          provider: selectedProvider.id,
-          db: selectedChild.id,
-        },
-        { replace: true },
-      );
-      return;
+    // prevent loops by comparing old to new
+    const newString = params.toString();
+    if (newString !== searchParams.toString() && newString !== "") {
+      setSearchParams(params, { replace: true });
     }
-
-    // --- PARTIAL / RESET ---
-    if (selectedProvider?.id) {
-      setSearchParams({ provider: selectedProvider.id }, { replace: true });
-      return;
-    }
-
-    setSearchParams({}, { replace: true });
-  }, [selectedProvider, selectedChild]);
+  }, [
+    selectedProvider,
+    selectedChild,
+    isCustom,
+    customUrl,
+    dbParam,
+    setSearchParams,
+  ]);
 
   // --- Structures / results via TanStack Query ---
   const { data: resultsData, isLoading: isLoading } = useQuery({
@@ -159,6 +192,8 @@ export function OptimadeClient({ hideProviderList = ["exmpl", "matcloud"] }) {
               selectedProvider={selectedProvider}
               selectedChild={selectedChild}
               onSelectChild={setSelectedChild}
+              childEntries={childEntries}
+              loadingChildren={loadingChildren}
             />
           </div>
 

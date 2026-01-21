@@ -9,25 +9,14 @@ export default function ChildProviderDropdown({
   selectedProvider,
   selectedChild,
   onSelectChild,
+  childEntries,
+  loadingChildren,
 }) {
   const [customInput, setCustomInput] = useState(
     selectedChild?.id === "__custom__" ? selectedChild.base_url : "",
   );
 
   const lastSubmittedCustom = useRef(customInput);
-
-  const { data, isLoading: loadingChildren } = useQuery({
-    queryKey: ["provider-links", selectedProvider?.attributes?.base_url],
-    queryFn: () => getProviderLinks(selectedProvider.attributes.base_url),
-    enabled: !!selectedProvider?.attributes?.base_url,
-    staleTime: Infinity,
-  });
-
-  const childEntries =
-    data?.children?.map((c) => ({
-      id: c.id,
-      ...(c.attributes ?? {}),
-    })) ?? [];
 
   useEffect(() => {
     if (!selectedProvider || selectedProvider.id === "__custom__") return;
