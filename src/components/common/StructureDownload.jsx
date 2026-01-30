@@ -1,12 +1,13 @@
 import { useState, useRef, useEffect } from "react";
 import { DownloadIcon } from "./Icons";
 
+import { CrystalStructure, Site } from "matsci-parse";
 import {
-  generateCIFfromMatrix,
-  generatePOSCAR,
-  generateXSF,
-  generateXYZ,
-} from "../../utils";
+  structureToXyz,
+  structureToPoscar,
+  structureToXsf,
+  structureToCif,
+} from "matsci-parse";
 
 const defaultFormats = [
   { format: "json", label: "JSON" },
@@ -44,31 +45,36 @@ export function StructureDownload({ OptimadeStructure, download_formats }) {
     OptimadeStructure?.attributes?.cartesian_site_positions || [];
   const species = OptimadeStructure.attributes.species_at_sites;
 
-  const sites = sitesRaw.map((pos, i) => ({
-    element: species[i],
-    x: pos[0],
-    y: pos[1],
-    z: pos[2],
-  }));
+  // format sites in the CrystalStructure format
+  const sites = sitesRaw.map((pos, i) => {
+    const element = species[i];
+    const speciesIndex = species.indexOf(element);
+    return new Site(speciesIndex, [pos[0], pos[1], pos[2]]);
+  });
 
-  const structureData = { lattice, sites };
+  const structureData = new CrystalStructure({
+    lattice: lattice,
+    species: species,
+    sites: sites,
+  });
 
   const handleDownload = (format) => {
     let content = "";
     let filename = "structure";
 
     if (format === "cif") {
-      content = generateCIFfromMatrix(structureData);
+      content = structureToCif(structureData);
       filename += ".cif";
     } else if (format === "xyz") {
-      content = generateXYZ(structureData);
+      content = structureToXyz(structureData);
       filename += ".xyz";
     } else if (format === "poscar") {
-      content = generatePOSCAR(structureData);
+      content = structureToPoscar(structureData);
       filename += ".vasp";
     } else if (format === "xsf") {
-      content = generateXSF(structureData);
+      content = structureToXsf(structureData);
       filename += ".xsf";
+      // dump it as an optimade string
     } else if (format === "json") {
       content = JSON.stringify(OptimadeStructure, null, 2);
       filename += ".json";

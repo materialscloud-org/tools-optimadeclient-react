@@ -4,40 +4,32 @@ import "react-json-view-lite/dist/index.css";
 import { StructureViewerWithDownload } from "../OptimadeStructureHandler";
 import QEInputButton from "../common/QEInputButton";
 
-import { generateCIFfromMatrix } from "../../utils";
-
 import { containerStyleHalf } from "../../styles/containerStyles";
 
-// TODO, switdch jsonview library
+import { optimadeToCrystalStructure } from "../../utils";
+
+import { structureToCif } from "matsci-parse";
 
 export function ResultViewer({ selectedResult }) {
-  const lattice = selectedResult?.attributes?.lattice_vectors ?? [];
-  const sitesRaw = selectedResult?.attributes?.cartesian_site_positions ?? [];
-  const species = selectedResult?.attributes?.species_at_sites ?? [];
+  const { structureData, cifText } = useMemo(() => {
+    if (!selectedResult) return { structureData: null, cifText: "" };
 
-  const sites = sitesRaw.map((pos, i) => ({
-    element: species[i],
-    x: pos[0],
-    y: pos[1],
-    z: pos[2],
-  }));
-
-  const structureData = useMemo(() => ({ lattice, sites }), [lattice, sites]);
-  const cifText = useMemo(
-    () => generateCIFfromMatrix(structureData),
-    [structureData]
-  );
+    try {
+      const structure = optimadeToCrystalStructure(selectedResult);
+      const cif = structure ? structureToCif(structure) : "";
+      return { structureData: structure, cifText: cif };
+    } catch (err) {
+      console.error("Failed to convert selectedResult:", err);
+      return { structureData: null, cifText: "" };
+    }
+  }, [selectedResult]);
 
   return (
     <div className="w-full flex flex-col">
-      {/* Result details */}
-      {selectedResult && (
+      {selectedResult ? (
         <div className="@container w-full flex flex-col md:flex-row gap-2 md:gap-4">
           <div className="w-full md:w-1/2">
-            <StructureViewerWithDownload
-              OptimadeStructure={selectedResult}
-              cifText={cifText}
-            />
+            <StructureViewerWithDownload OptimadeStructure={selectedResult} />
           </div>
           <div className={containerStyleHalf}>
             <JsonView
@@ -48,7 +40,7 @@ export function ResultViewer({ selectedResult }) {
             />
           </div>
         </div>
-      )}
+      ) : null}
 
       <div className="mt-2 md:mt-4 flex justify-center">
         <QEInputButton cifText={cifText} />
