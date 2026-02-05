@@ -73,23 +73,33 @@ export default function RangeSlider({ title, value, onChange, min, max }) {
           max={max}
           values={value}
           onChange={onChange}
-          renderTrack={({ props, children }) => (
-            <div {...props} className={sliderBgStyle}>
+          renderTrack={({ props, children }) => {
+            const { key, ...rest } = props;
+            return (
+              <div key={key} {...rest} className={sliderBgStyle}>
+                <div
+                  className={sliderFgStyle}
+                  style={{
+                    left: `${((value[0] - min) / (max - min)) * 100}%`,
+                    width: `${((value[1] - value[0]) / (max - min)) * 100}%`,
+                  }}
+                />
+                {children}
+              </div>
+            );
+          }}
+          renderThumb={({ props }) => {
+            const { key, ...rest } = props;
+            return (
               <div
-                className={sliderFgStyle}
-                style={{
-                  left: `${((value[0] - min) / (max - min)) * 100}%`,
-                  width: `${((value[1] - value[0]) / (max - min)) * 100}%`,
-                }}
-              />
-              {children}
-            </div>
-          )}
-          renderThumb={({ props }) => (
-            <div {...props} className="relative w-5 h-5 flex items-center">
-              <div className={sliderThumbStyle} />
-            </div>
-          )}
+                key={key}
+                {...rest}
+                className="relative w-5 h-5 flex items-center"
+              >
+                <div className={sliderThumbStyle} />
+              </div>
+            );
+          }}
         />
         <input
           type="number"

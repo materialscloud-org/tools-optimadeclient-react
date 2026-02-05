@@ -27,24 +27,25 @@ export function ResultViewer({ selectedResult }) {
   return (
     <div className="w-full flex flex-col">
       {selectedResult ? (
-        <div className="@container w-full flex flex-col md:flex-row gap-2 md:gap-4">
-          <div className="w-full md:w-1/2">
-            <StructureViewerWithDownload OptimadeStructure={selectedResult} />
+        <div>
+          <div className="@container w-full flex flex-col md:flex-row gap-2 md:gap-4">
+            <div className="w-full md:w-1/2">
+              <StructureViewerWithDownload OptimadeStructure={selectedResult} />
+            </div>
+            <div className={containerStyleHalf}>
+              <JsonView
+                data={selectedResult}
+                compactTopLevel
+                shouldExpandNode={(level) => level < 2}
+                style={{ backgroundColor: "" }}
+              />
+            </div>
           </div>
-          <div className={containerStyleHalf}>
-            <JsonView
-              data={selectedResult}
-              compactTopLevel
-              shouldExpandNode={(level) => level < 2}
-              style={{ backgroundColor: "" }}
-            />
+          <div className="mt-2 md:mt-4 flex justify-center">
+            <QEInputButton cifText={cifText} />
           </div>
         </div>
       ) : null}
-
-      <div className="mt-2 md:mt-4 flex justify-center">
-        <QEInputButton cifText={cifText} />
-      </div>
     </div>
   );
 }

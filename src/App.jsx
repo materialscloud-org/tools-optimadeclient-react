@@ -1,4 +1,5 @@
 import { useState } from "react";
+import MaterialsCloudHeader from "mc-react-header";
 
 import { OptimadeClient } from "./components/OptimadeClient";
 
@@ -23,7 +24,19 @@ const badProviders = [
 ];
 
 function App() {
-  return <OptimadeClient hideProviderList={badProviders} />;
+  return (
+    <>
+      <MaterialsCloudHeader
+        className="header"
+        activeSection="work"
+        breadcrumbsPath={[
+          { name: "Work", link: "https://www.materialscloud.org/work" },
+          { name: "OPTIMADE-Client", link: null },
+        ]}
+      />
+      <OptimadeClient hideProviderList={badProviders} />
+    </>
+  );
 }
 
 export default App;
