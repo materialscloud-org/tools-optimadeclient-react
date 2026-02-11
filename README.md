@@ -15,4 +15,21 @@ npm run dev
 http://localhost:5173/mc-react-optimade-client/
 ```
 
+### python anywidget
+
+The querier is also exported as an AnyWidget that can be used in a Jupyter enviroment.
+
+```sh
+pip install widget-optimade-client
+```
+
+Usage:
+
+```py
+from optimadewidget.optimade_widget import OptimadeQuerierWidget
+w = OptimadeQuerierWidget()
+w
+
+```
+
 ---
