@@ -21,7 +21,7 @@ export default defineConfig({
       },
     },
     cssCodeSplit: true,
-    outDir: "widget-dist",
+    outDir: "optimadewidget/widget-dist",
     emptyOutDir: true,
   },
   base: "",

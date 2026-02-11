@@ -4,58 +4,19 @@ build-backend = "hatchling.build"
 
 [project]
 name = "widget-optimade-client"
-version = "0.1.0"
+version = "0.0.4a"
 description = "A Jupyter widget for querying OPTIMADE-compatible providers"
 readme = "README.md"
 requires-python = ">=3.8"
-keywords = ["jupyter", "anywidget", "optimade", "materials", "science"]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Framework :: Jupyter",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Topic :: Scientific/Engineering :: Chemistry",
-]
 dependencies = ["traitlets>=5.0", "anywidget>=0.2"]
 
-[project.urls]
-Home = "https://github.com/materialscloud-org/tools-optimadeclient-react"
-Source = "https://github.com/materialscloud-org/tools-optimadeclient-react"
-
-[project.optional-dependencies]
-dev = ["jupyterlab", "notebook", "watchfiles", "pytest", "black"]
-
-[tool.hatch.envs.default]
-features = ["dev"]
-
-# Build configuration
 [tool.hatch.build]
-only-packages = true
-artifacts = ["widget-dist/*"]
+ignore-vcs = true
 
-[tool.hatch.build.hooks.jupyter-builder]
-build-function = "hatch_jupyter_builder.npm_builder"
-ensured-targets = ["widget-dist/optimade_widget.js"]
-skip-if-exists = ["widget-dist/optimade_widget.js"]
-dependencies = ["hatch-jupyter-builder>=0.5.0"]
 
-[tool.hatch.build.hooks.jupyter-builder.build-kwargs]
-npm = "npm"
-build_cmd = "build"
-
-# Optional: automatic version bumping
-[tool.bumpver]
-current_version = "v0.1.0"
-version_pattern = "vMAJOR.MINOR.PATCH[PYTAGNUM]"
-commit_message = "Bump version {old_version} -> {new_version}"
-commit = true
-tag = true
-push = true
-
-[tool.bumpver.file_patterns]
-"pyproject.toml" = [
-    'version = "{pep440_version}"',
-    'current_version = "{version}"'
+[tool.hatch.build.targets.wheel]
+packages = ["optimadewidget"]
+include = [
+    "optimadewidget/widget-dist/*.js",
+    "optimadewidget/widget-dist/*.css"
 ]

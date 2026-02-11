@@ -10,6 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
 
+    permissions:
+      id-token: write
+      contents: read
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -22,19 +26,17 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install build hatch hatch-jupyter-builder
+          python -m pip install hatch hatch-jupyter-builder
 
-      - name: Build the package with Hatch
+      - name: Build the widget JS
         run: |
-          hatch build
+          npm ci
+          npm run build:widget
 
-      - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: dist/*
-          generate_release_notes: true
+      - name: Build Python package
+        run: hatch build
 
-      - name: Publish package to PyPI (using trusted publisher)
+      - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist/
