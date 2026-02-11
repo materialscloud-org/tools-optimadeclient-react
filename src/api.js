@@ -329,12 +329,16 @@ export async function getPTablePopulation({
     )} seconds \n====== URL ${providerUrl} finished batch searches. ======\n`,
   );
 
+  const avgTimePerRequest =
+    totalRequests > 0 ? (endTime - startTime) / totalRequests / 1000 : 0;
+
   const elementMap = elements.reduce((acc, e) => {
     acc[e.sym] = presentElements.has(e.sym);
     return acc;
   }, {});
+
   return {
-    ...elementMap, // <- top-level symbols (legacy)
-    timing: avgTimePerRequest, // <- new field
+    ...elementMap,
+    timing: avgTimePerRequest,
   };
 }

@@ -39,19 +39,19 @@ export default function PTable({
         const res = await fetch("./cachedPTable.json");
         if (!res.ok) throw new Error("Failed to load cached PTable");
 
-        // Read last-modified header
-        const lastMod = res.headers.get("last-modified");
-        if (lastMod) {
-          const dateOnly = new Date(lastMod).toLocaleDateString(); // e.g., "11/24/2025" depending on locale
-          setLastModified(dateOnly);
+        const json = await res.json();
+        // Convert to lookup map for fast access
+        if (json.lastUpdated) {
+          setLastModified(new Date(json.lastUpdated).toLocaleDateString());
         }
 
-        const data = await res.json();
-        // Convert to lookup map for fast access
+        console.log(json);
+
         const map = {};
-        data.forEach((entry) => {
+        json.data.forEach((entry) => {
           map[entry.providerUrl] = entry.ptable;
         });
+
         setCachedPTable(map);
       } catch (err) {
         console.error("Failed to load cached PTable:", err);
@@ -88,7 +88,7 @@ export default function PTable({
     if (state === 1) return selectedClassName;
     if (state === 2) return deselectedClassName;
 
-    const opacityClass = el.present === false ? "opacity-30" : "";
+    const opacityClass = el.present === 0 ? "opacity-30" : "";
 
     return `${baseColor} ${defaultBorderClassName} ${opacityClass}`;
   };
@@ -117,7 +117,7 @@ export default function PTable({
                 <button
                   onClick={() => toggle(el.sym)}
                   className={`flex flex-col justify-center items-center w-full h-full rounded-sm ${hoverClassName} ${getColorClass(
-                    el
+                    el,
                   )}`}
                 >
                   <span className="text-[0px] opacity-0 @sm:text-[0.3rem] @sm:opacity-100 @md:text-[0.5rem] @lg:text-[0.7rem] text-gray-700 leading-tight">

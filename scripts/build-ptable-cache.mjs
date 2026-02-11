@@ -19,11 +19,15 @@ const MAX_CONCURRENT_PROVIDERS = 8;
 function loadCache() {
   if (fs.existsSync(OUTPUT_PATH)) {
     try {
-      const data = JSON.parse(fs.readFileSync(OUTPUT_PATH, "utf-8"));
+      const raw = JSON.parse(fs.readFileSync(OUTPUT_PATH, "utf-8"));
+
+      const data = raw.data ?? raw;
+
       const map = {};
       for (const entry of data) {
         map[entry.providerUrl] = entry.ptable;
       }
+
       return map;
     } catch (err) {
       console.warn("Failed to parse cache:", err);
@@ -34,11 +38,17 @@ function loadCache() {
 }
 
 function saveCache(resultMap) {
-  const array = Object.entries(resultMap).map(([providerUrl, ptable]) => ({
+  const array = Object.entries(resultMap).map(([providerUrl, value]) => ({
     providerUrl,
-    ptable,
+    ...value,
   }));
-  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(array, null, 2));
+
+  const payload = {
+    lastUpdated: new Date().toISOString(),
+    data: array,
+  };
+
+  fs.writeFileSync(OUTPUT_PATH, JSON.stringify(payload, null, 2));
 }
 
 async function processProvider(provider, prevCache, resultMap) {
@@ -78,14 +88,20 @@ async function processProvider(provider, prevCache, resultMap) {
     }
 
     const filtered = Object.fromEntries(
-      Object.entries(ptable).filter(([_, v]) => v === false)
+      Object.entries(ptable).filter(
+        ([key, value]) => key !== "timing" && value === false,
+      ),
     );
 
-    if (Object.keys(filtered).length === Object.keys(ptable).length) {
-      resultMap[url] = { all: false };
-    } else {
-      resultMap[url] = filtered;
-    }
+    const entry =
+      Object.keys(filtered).length === Object.keys(ptable).length - 1
+        ? { all: false }
+        : filtered;
+
+    resultMap[url] = {
+      ptable: entry,
+      avgTimePerRequest: ptable.timing,
+    };
 
     saveCache(resultMap);
   }
