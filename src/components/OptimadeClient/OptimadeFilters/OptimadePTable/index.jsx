@@ -100,7 +100,7 @@ export default function PTable({
     if (state === 1) return selectedClassName;
     if (state === 2) return deselectedClassName;
 
-    const opacityClass = el.present === 0 ? "opacity-30" : "";
+    const opacityClass = !el.present ? "opacity-30" : "";
 
     return `${baseColor} ${defaultBorderClassName} ${opacityClass}`;
   };

@@ -6,11 +6,6 @@ import {
   getPTablePopulation,
 } from "../src/api.js";
 
-// other caching methods
-import { saveBinaryCache, saveBitMapCache, ELEMENTS } from "./cacheFormats.js";
-const OUTPUT_BINARY = path.resolve("./public/cachedPTableBinary.json");
-const OUTPUT_BITMAP = path.resolve("./public/cachedPTableBitMap.json");
-
 const OUTPUT_PATH = path.resolve("./public/cachedPTable.json");
 
 const MAX_CONCURRENT_PROVIDERS = 8;
@@ -73,7 +68,7 @@ async function processProvider(provider, prevCache, resultMap) {
     if (!url || !url.startsWith("http")) continue;
 
     const existingCache = prevCache[url] || {};
-    const batchSize = Object.keys(existingCache).length > 0 ? 32 : 1;
+    const batchSize = 32;
 
     let ptable;
     try {
@@ -87,16 +82,13 @@ async function processProvider(provider, prevCache, resultMap) {
       continue;
     }
 
-    const filtered = Object.fromEntries(
-      Object.entries(ptable).filter(
-        ([key, value]) => key !== "timing" && value === false,
-      ),
+    const elementsOnly = Object.fromEntries(
+      Object.entries(ptable).filter(([key]) => key !== "timing"),
     );
 
-    const entry =
-      Object.keys(filtered).length === Object.keys(ptable).length - 1
-        ? { all: false }
-        : filtered;
+    const entry = Object.values(elementsOnly).every((v) => v === false)
+      ? { all: false }
+      : elementsOnly;
 
     resultMap[url] = {
       ptable: entry,
@@ -125,10 +117,6 @@ async function main() {
     });
 
   await Promise.all(workers);
-
-  // save additional formats
-  saveBinaryCache(resultMap, OUTPUT_BINARY);
-  saveBitMapCache(resultMap, OUTPUT_BITMAP);
 
   console.log("\nAll providers processed. Final write complete:");
   console.log("cachedPTable.json:", OUTPUT_PATH);

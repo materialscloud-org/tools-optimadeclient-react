@@ -160,7 +160,7 @@ export function OptimadeQuerier({
 
   return (
     <>
-      <div className="pt-4 p-2 w-full flex flex-col gap-2 max-w-[650px]">
+      <div className="pt-4 p-2 w-full flex flex-col gap-2 mx-auto max-w-[650px]">
         <ParentProviderDropdown
           providers={providers}
           selectedProvider={selectedProvider}
