@@ -34,28 +34,40 @@ export default function PTable({
   // Load cached PTable once on mount
   useEffect(() => {
     const loadCache = async () => {
-      try {
-        // Fetch cached PTable
-        const res = await fetch("./cachedPTable.json");
-        if (!res.ok) throw new Error("Failed to load cached PTable");
-
-        const json = await res.json();
-        // Convert to lookup map for fast access
-        if (json.lastUpdated) {
-          setLastModified(new Date(json.lastUpdated).toLocaleDateString());
+      const urls = [
+        "./cachedPTable.json",
+        "https://raw.githubusercontent.com/materialscloud-org/tools-optimadeclient-react/main/public/cachedPTable.json",
+      ];
+      let json = null;
+      for (const url of urls) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok)
+            throw new Error(`Failed to load cached PTable from ${url}`);
+          json = await res.json();
+          console.log(`Loaded cached PTable from ${url}`);
+          break;
+        } catch (err) {
+          console.warn(err.message);
         }
-
-        console.log(json);
-
-        const map = {};
-        json.data.forEach((entry) => {
-          map[entry.providerUrl] = entry.ptable;
-        });
-
-        setCachedPTable(map);
-      } catch (err) {
-        console.error("Failed to load cached PTable:", err);
       }
+
+      if (!json) {
+        console.error("Failed to load cached PTable from all sources");
+        return;
+      }
+
+      // Use lastUpdated for UI
+      if (json.lastUpdated) {
+        setLastModified(new Date(json.lastUpdated).toLocaleDateString());
+      }
+
+      // Convert to lookup map
+      const map = {};
+      json.data.forEach((entry) => {
+        map[entry.providerUrl] = entry.ptable;
+      });
+      setCachedPTable(map);
     };
 
     loadCache();
