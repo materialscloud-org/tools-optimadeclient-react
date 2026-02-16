@@ -65,7 +65,19 @@ export default function PTable({
       // Convert to lookup map
       const map = {};
       json.data.forEach((entry) => {
-        map[entry.providerUrl] = entry.ptable;
+        if (!entry.providerUrl) return;
+
+        const key = entry.providerUrl.replace(/\/+$/, "");
+        // Check if `ptable` exists, otherwise check flattened object
+        const ptable =
+          entry.ptable ??
+          Object.fromEntries(
+            Object.entries(entry).filter(
+              ([k]) => k !== "providerUrl" && k !== "lastUpdated",
+            ),
+          );
+
+        map[key] = ptable;
       });
       setCachedPTable(map);
     };
