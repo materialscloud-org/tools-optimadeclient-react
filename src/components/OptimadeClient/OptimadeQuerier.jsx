@@ -128,24 +128,47 @@ export function OptimadeQuerier({
   };
 
   // --- Structures / results via TanStack Query ---
-  const { data: resultsData, isLoading: isLoading } = useQuery({
+  const TIMEOUT_MS = 25_000; // 25 seconds
+  const {
+    data: resultsData,
+    isLoading,
+    isError,
+    error,
+  } = useQuery({
     queryKey: [
       "structures",
       selectedChild?.base_url,
       currentFilter,
       currentPage,
     ],
-    queryFn: () =>
-      getStructures({
-        providerUrl: selectedChild?.base_url,
-        filter: currentFilter,
-        page: currentPage,
-      }),
+    queryFn: async () => {
+      if (!selectedChild?.base_url) return null;
+      // Wrap the fetch in a timeout promise
+      const fetchWithTimeout = new Promise(async (resolve, reject) => {
+        const timer = setTimeout(() => {
+          reject(new Error("Request timed out after 25 seconds"));
+        }, TIMEOUT_MS);
+
+        try {
+          const data = await getStructures({
+            providerUrl: selectedChild.base_url,
+            filter: currentFilter,
+            page: currentPage,
+          });
+          clearTimeout(timer);
+          resolve(data);
+        } catch (err) {
+          clearTimeout(timer);
+          reject(new Error(err?.message));
+        }
+      });
+
+      return fetchWithTimeout;
+    },
     enabled: !!selectedChild?.base_url,
     staleTime: 2 * 60 * 1000,
-    keepPreviousData: true, // keeps previous page visible while fetching new page
+    keepPreviousData: true,
   });
-
   const results = resultsData?.data ?? [];
   const metaData = resultsData?.meta ?? { data_returned: 0, data_available: 0 };
   const totalPages =
@@ -193,6 +216,37 @@ export function OptimadeQuerier({
           <OptimadeChildInfo child={selectedChild} />
         </div>
       </div>
+
+      {isError && (
+        <div className="flex items-start p-4 text-red-800 bg-red-50 border border-red-300 rounded-lg shadow-sm">
+          <svg
+            className="w-5 h-5 shrink-0"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 8v4m0 4h.01M21 12c0 4.9706-4.0294 9-9 9s-9-4.0294-9-9 4.0294-9 9-9 9 4.0294 9 9z"
+            />
+          </svg>
+          <div className="text-sm leading-relaxed">
+            Could not fetch data — the provider subdataset{" "}
+            <a
+              href={selectedChild.base_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 underline hover:text-blue-800"
+            >
+              {selectedChild.base_url}
+            </a>{" "}
+            may be unreachable. Please try again later.
+          </div>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="p-2 w-full">
