@@ -38,7 +38,7 @@ export function OptimadeQuerier({
   // --- Providers list ---
   const { data: providersData } = useQuery({
     queryKey: ["providers", hideProviderList],
-    queryFn: () => getProvidersList(undefined, hideProviderList),
+    queryFn: () => getProvidersList(hideProviderList),
     staleTime: Infinity,
   });
 

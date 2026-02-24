@@ -8,19 +8,12 @@ import "./index.css";
 // current known bad providers.
 const badProviders = [
   "exmpl", // example provider shouldnt be shown.
-  "aiida", // base_url is null...
   "aflow", // returns a 500 error.
-  "ccdc", // base_url is null...
-  "ccpnc", // base_url is null...
-  //"cmr",  - is fine but has weird data.
-  "httk", // base_url is null...
   "matcloud", // child endpoint doesnt work or return properly?
-  "mpds", // behind a paywall - should skip i guess.
+  "mpds", // behind a paywall
   "mpod", // url seems to be down at the moment - skip.
   "optimake", // not an actual provider
   "optimade", // not an actual provider
-  "pcod", // base_url is null...
-  "psdi", // base_url is null...
 ];
 
 function App() {
@@ -31,6 +24,7 @@ function App() {
         activeSection="work"
         breadcrumbsPath={[
           { name: "Work", link: "https://www.materialscloud.org/work" },
+          { name: "Tools", link: "https://www.materialscloud.org/work/tools" },
           { name: "OPTIMADE-Client", link: null },
         ]}
       />
