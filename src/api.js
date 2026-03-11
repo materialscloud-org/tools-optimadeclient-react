@@ -2,9 +2,6 @@ import { corsProxies } from "./corsProxies.js";
 
 import { elements } from "./components/OptimadeClient/OptimadeFilters/OptimadePTable/elements.js";
 
-const OFFICIAL_PROVIDERS_URL =
-  "https://raw.githubusercontent.com/Materials-Consortia/providers/refs/heads/master/src/links/v1/providers.json";
-
 async function fetchWithCorsFallback(url) {
   const attempts = [
     { name: "direct", url },
@@ -28,8 +25,11 @@ async function fetchWithCorsFallback(url) {
 }
 
 // --- Providers list ---
-// Fetch from the Materials Consortia official list, fallback to the cached version in this repo
-export async function getProvidersList(excludeIds = []) {
+// go to optimade url, if that fails use the fallback here.
+export async function getProvidersList(
+  providersUrl = "https://raw.githubusercontent.com/Materials-Consortia/providers/refs/heads/master/src/links/v1/providers.json",
+  excludeIds = [],
+) {
   async function fetchJson(url) {
     const res = await fetch(url);
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -38,22 +38,21 @@ export async function getProvidersList(excludeIds = []) {
 
   let json;
   try {
-    json = await fetchJson(OFFICIAL_PROVIDERS_URL);
+    json = await fetchJson(providersUrl);
   } catch (err) {
     console.warn(
       "Remote fetch failed, falling back to cachedProviders.json:",
       err,
     );
-    json = await fetchJson("cachedProviders.json");
+    try {
+      json = await fetchJson("cachedProviders.json");
+    } catch (fallbackErr) {
+      console.error("Both remote and local fetches failed:", fallbackErr);
+      throw fallbackErr;
+    }
   }
 
-  const filteredData = json.data.filter(
-    (p) =>
-      !excludeIds.includes(p.id) &&
-      typeof p.attributes.base_url === "string" &&
-      p.attributes.base_url.trim() !== "",
-  );
-
+  const filteredData = json.data.filter((p) => !excludeIds.includes(p.id));
   return { ...json, data: filteredData };
 }
 

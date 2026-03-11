@@ -7,8 +7,20 @@ import QEInputButton from "../common/QEInputButton";
 import { containerStyleHalf } from "../../styles/containerStyles";
 
 import { optimadeToCrystalStructure } from "../../utils";
-
 import { structureToCif } from "matsci-parse";
+
+import { SmilesViewer } from "../OptimadeSmilesHandler";
+
+function getSmiles(attributes) {
+  if (!attributes) return null;
+
+  const key = Object.keys(attributes).find((k) =>
+    k.toLowerCase().includes("smiles"),
+  );
+
+  if (key) return attributes[key];
+  return null;
+}
 
 export function ResultViewer({ selectedResult }) {
   const { structureData, cifText } = useMemo(() => {
@@ -24,13 +36,29 @@ export function ResultViewer({ selectedResult }) {
     }
   }, [selectedResult]);
 
+  const crystalPositions = selectedResult?.attributes?.cartesian_site_positions;
+  const smiles = getSmiles(selectedResult?.attributes);
+
+  const shouldRenderCrystal = structureData && crystalPositions;
+  const shouldRenderSmiles = !shouldRenderCrystal && smiles;
+
   return (
     <div className="w-full flex flex-col">
       {selectedResult ? (
         <div>
           <div className="@container w-full flex flex-col md:flex-row gap-2 md:gap-4">
             <div className="w-full md:w-1/2">
-              <StructureViewerWithDownload OptimadeStructure={selectedResult} />
+              {shouldRenderCrystal ? (
+                <StructureViewerWithDownload
+                  OptimadeStructure={selectedResult}
+                />
+              ) : shouldRenderSmiles ? (
+                <SmilesViewer smilesStr={smiles} width={450} height={450} />
+              ) : (
+                <div className="text-center text-red-600">
+                  No crystal structure or SMILES available
+                </div>
+              )}
             </div>
             <div className={containerStyleHalf}>
               <JsonView

@@ -25,7 +25,8 @@
     "react-dom": "^18.2.0",
     "react-json-view-lite": "^2.5.0",
     "react-range": "^1.10.0",
-    "react-router-dom": "^7.12.0"
+    "react-router-dom": "^7.12.0",
+    "smiles-drawer": "^2.1.7"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.1.16",

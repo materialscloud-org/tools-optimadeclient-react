@@ -53,7 +53,7 @@ export default function HelpIcon({
       {popover && (
         <span
           className={`absolute ${positionClasses} w-max max-w-xs rounded-sm ${popoutBgColor} ${popoutTextColor} text-xs p-1
-          text-center opacity-0 group-hover:opacity-100 transition-opacity z-50 pointer-events-none ${popoutStyleOverrides}`}
+          text-center opacity-0 group-hover:opacity-100 transition-opacity duration-400 z-50 pointer-events-none ${popoutStyleOverrides}`}
         >
           {popover}
         </span>
