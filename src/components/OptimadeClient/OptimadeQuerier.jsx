@@ -25,6 +25,7 @@ export function OptimadeQuerier({
 }) {
   const [currentFilter, setCurrentFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showNoResults, setShowNoResults] = useState(false);
 
   const isCustom = !!customUrl;
 
@@ -170,8 +171,6 @@ export function OptimadeQuerier({
     keepPreviousData: true,
   });
   const results = resultsData?.data ?? [];
-
-  console.log(resultsData)
   const metaData = resultsData?.meta ?? { data_returned: 0, data_available: 0 };
   const totalPages =
     metaData.data_returned != null
@@ -182,6 +181,17 @@ export function OptimadeQuerier({
   useEffect(() => {
     setSelectedResult(results[0] ?? null);
   }, [results]);
+
+  useEffect(() => {
+    if (isLoading || selectedResult || !currentFilter) {
+      setShowNoResults(false);
+      return;
+    }
+
+    // delay showing of missing results
+    const timer = setTimeout(() => setShowNoResults(true), 0);
+    return () => clearTimeout(timer);
+  }, [isLoading, selectedResult, currentFilter]);
 
   return (
     <>
@@ -281,7 +291,7 @@ export function OptimadeQuerier({
           <div className="border-b border-slate-300 py-2" />
 
           {/* No results message */}
-          {!isLoading && !selectedResult && currentFilter && (
+          {showNoResults && (
             <div className="p-2">
               <OptimadeNoResults
                 queryUrl={selectedChild?.base_url}
