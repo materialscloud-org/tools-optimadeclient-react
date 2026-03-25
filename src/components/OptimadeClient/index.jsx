@@ -58,17 +58,19 @@ export function OptimadeClient({ hideProviderList }) {
           <OptimadeFAQs />
         </div>
 
-        <OptimadeQuerier
-          selectedResult={selectedResult}
-          setSelectedResult={setSelectedResult}
-          hideProviderList={hideProviderList}
-          customUrl={customUrl}
-          providerParam={providerParam}
-          dbParam={dbParam}
-          updateUrlParams={updateUrlParams}
-        />
+        <div className="w-full min-h-[1690px]">
+          <OptimadeQuerier
+            selectedResult={selectedResult}
+            setSelectedResult={setSelectedResult}
+            hideProviderList={hideProviderList}
+            customUrl={customUrl}
+            providerParam={providerParam}
+            dbParam={dbParam}
+            updateUrlParams={updateUrlParams}
+          />
 
-        <ResultViewer selectedResult={selectedResult} />
+          <ResultViewer selectedResult={selectedResult} />
+        </div>
       </div>
     </div>
   );
