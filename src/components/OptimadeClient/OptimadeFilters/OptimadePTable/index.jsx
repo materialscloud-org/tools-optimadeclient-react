@@ -89,12 +89,18 @@ export default function PTable({
   useEffect(() => {
     if (!providerUrl || !cachedPTable) return;
 
-    const ptable = cachedPTable[providerUrl] || {};
+    const ptable = cachedPTable[providerUrl];
 
-    const updatedElements = allElements.map((el) => ({
-      ...el,
-      present: el.sym in ptable ? ptable[el.sym] : undefined,
-    }));
+    const updatedElements = allElements.map((el) => {
+      // Case 1: provider not in cache everything full color
+      if (!ptable) return { ...el, present: true };
+
+      // Case 2: element in cache use cached value
+      if (el.sym in ptable) return { ...el, present: ptable[el.sym] };
+
+      // Case 3: element missing in provider full color
+      return { ...el, present: true };
+    });
 
     setElements(updatedElements);
   }, [providerUrl, cachedPTable]);
@@ -112,7 +118,8 @@ export default function PTable({
     if (state === 1) return selectedClassName;
     if (state === 2) return deselectedClassName;
 
-    const opacityClass = !el.present ? "opacity-30" : "";
+    // Only grey out elements explicitly marked as absent (false)
+    const opacityClass = el.present === false ? "opacity-30" : "";
 
     return `${baseColor} ${defaultBorderClassName} ${opacityClass}`;
   };

@@ -170,6 +170,8 @@ export function OptimadeQuerier({
     keepPreviousData: true,
   });
   const results = resultsData?.data ?? [];
+
+  console.log(resultsData)
   const metaData = resultsData?.meta ?? { data_returned: 0, data_available: 0 };
   const totalPages =
     metaData.data_returned != null
