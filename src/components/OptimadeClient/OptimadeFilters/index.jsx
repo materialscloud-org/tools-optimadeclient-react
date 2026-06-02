@@ -21,7 +21,7 @@ export default function OptimadeFilters({ queryUrl, initialFilter, onSubmit }) {
     [1, 1000],
     selectedElements,
     numAtomsRange,
-    numSitesRange
+    numSitesRange,
   );
 
   const filterString = manualMode ? manualQuery : generatedQuery;

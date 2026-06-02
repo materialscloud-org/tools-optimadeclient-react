@@ -51,7 +51,7 @@ export function OptimadeClient({ hideProviderList }) {
   const [selectedResult, setSelectedResult] = useState(null);
 
   return (
-    <div className="min-h-screen max-w-5xl mx-auto bg-white mb-4 shadow-md rounded-xs">
+    <div className="min-h-screen max-w-6xl mx-auto bg-white mb-4 shadow-md rounded-xs">
       <div className="flex flex-col items-center w-full px-2 md:px-4 py-2">
         <OptimadeHeader />
         <div className="p-2 w-full">
@@ -68,7 +68,6 @@ export function OptimadeClient({ hideProviderList }) {
             dbParam={dbParam}
             updateUrlParams={updateUrlParams}
           />
-
           <ResultViewer selectedResult={selectedResult} />
         </div>
       </div>

@@ -1,6 +1,7 @@
 // Simple periodic table data up to 118
 // Each element has atomic number, symbol, row, and column (group)
 export const elements = [
+  {},
   // Period 1
   { num: 1, sym: "H", row: 1, col: 1, group: "group1" },
   { num: 2, sym: "He", row: 1, col: 18, group: "group18" },
