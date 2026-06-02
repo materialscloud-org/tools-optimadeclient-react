@@ -6,8 +6,7 @@ import QEInputButton from "../common/QEInputButton";
 
 import { containerStyleHalf } from "../../styles/containerStyles";
 
-import { optimadeToCrystalStructure } from "../../utils";
-import { structureToCif } from "matsci-parse";
+import { fromOptimade, toCIF } from "matsci-parse";
 
 import { SmilesViewer } from "../OptimadeSmilesHandler";
 
@@ -27,11 +26,16 @@ export function ResultViewer({ selectedResult }) {
     if (!selectedResult) return { structureData: null, cifText: "" };
 
     try {
-      const structure = optimadeToCrystalStructure(selectedResult);
-      const cif = structure ? structureToCif(structure) : "";
+      const structure = fromOptimade(selectedResult);
+      const cif = structure ? toCIF(structure) : "";
       return { structureData: structure, cifText: cif };
     } catch (err) {
       console.error("Failed to convert selectedResult:", err);
+      console.error(
+        "Perhaps this provider does not define the neccessary fields",
+        err,
+      );
+
       return { structureData: null, cifText: "" };
     }
   }, [selectedResult]);

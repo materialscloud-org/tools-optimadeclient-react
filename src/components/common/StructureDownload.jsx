@@ -1,16 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { DownloadIcon } from "./Icons";
 
-import { CrystalStructure, Site } from "matsci-parse";
-import {
-  structureToXyz,
-  structureToPoscar,
-  structureToXsf,
-  structureToCif,
-} from "matsci-parse";
-
 const defaultFormats = [
-  { format: "json", label: "JSON" },
+  { format: "jsonOM", label: "JSON" },
+  // { format: "jsonMSP", label: "matsci-parse" },
   { format: "cif", label: "CIF" },
   { format: "xyz", label: "XYZ" },
   { format: "xsf", label: "XSF" },
@@ -19,6 +12,7 @@ const defaultFormats = [
 
 import { baseButtonStyle } from "../../styles/buttonStyles";
 import { textSmall } from "../../styles/textStyles";
+import { toCIF, toPOSCAR, toXSF, toXYZ, toJSON } from "matsci-parse";
 
 // === Download Helper ===
 function downloadFile(content, filename) {
@@ -34,50 +28,39 @@ function downloadFile(content, filename) {
 }
 
 // === React Component ===
-export function StructureDownload({ OptimadeStructure, download_formats }) {
+export function StructureDownload({
+  structure,
+  OptimadeStructure,
+  download_formats,
+}) {
   const [open, setOpen] = useState(false);
   const containerRef = useRef(null);
 
   const downloadFormats = download_formats || defaultFormats;
-
-  const lattice = OptimadeStructure.attributes.lattice_vectors;
-  const sitesRaw =
-    OptimadeStructure?.attributes?.cartesian_site_positions || [];
-  const species = OptimadeStructure.attributes.species_at_sites;
-
-  // format sites in the CrystalStructure format
-  const sites = sitesRaw.map((pos, i) => {
-    const element = species[i];
-    const speciesIndex = species.indexOf(element);
-    return new Site(speciesIndex, [pos[0], pos[1], pos[2]]);
-  });
-
-  const structureData = new CrystalStructure({
-    lattice: lattice,
-    species: species,
-    sites: sites,
-  });
 
   const handleDownload = (format) => {
     let content = "";
     let filename = "structure";
 
     if (format === "cif") {
-      content = structureToCif(structureData);
+      content = toCIF(structure);
       filename += ".cif";
     } else if (format === "xyz") {
-      content = structureToXyz(structureData);
+      content = toXYZ(structure);
       filename += ".xyz";
     } else if (format === "poscar") {
-      content = structureToPoscar(structureData);
+      content = toPOSCAR(structure);
       filename += ".vasp";
     } else if (format === "xsf") {
-      content = structureToXsf(structureData);
+      content = toXSF(structure);
       filename += ".xsf";
       // dump it as an optimade string
-    } else if (format === "json") {
+    } else if (format === "jsonOM") {
       content = JSON.stringify(OptimadeStructure, null, 2);
-      filename += ".json";
+      filename += "_OPTIMADE.json";
+    } else if (format === "jsonMSP") {
+      content = JSON.stringify(toJSON(structure), null, 2);
+      filename += "_matsciparse.json";
     }
 
     if (content) downloadFile(content, filename);

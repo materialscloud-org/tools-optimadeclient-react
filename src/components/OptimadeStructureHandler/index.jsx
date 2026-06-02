@@ -3,20 +3,17 @@ import { StructureDownload } from "../common/StructureDownload";
 
 import { textError } from "../../styles/textStyles";
 import { containerStyle } from "../../styles/containerStyles";
-
-import { structureToCif } from "matsci-parse";
-
-import { optimadeToCrystalStructure } from "../../utils";
+import { fromOptimade, toCIF } from "matsci-parse";
 
 export function StructureViewerWithDownload({ OptimadeStructure }) {
-  let structureData = null;
+  let structure = null;
   let cifText = "";
   let hasError = false;
 
   try {
     if (OptimadeStructure) {
-      structureData = optimadeToCrystalStructure(OptimadeStructure);
-      cifText = structureData ? structureToCif(structureData) : "";
+      structure = fromOptimade(OptimadeStructure);
+      cifText = structure ? toCIF(structure) : "";
     } else {
       hasError = true;
     }
@@ -46,7 +43,10 @@ export function StructureViewerWithDownload({ OptimadeStructure }) {
       </div>
 
       <div className="absolute top-2 right-2 z-10">
-        <StructureDownload OptimadeStructure={OptimadeStructure} />
+        <StructureDownload
+          structure={structure}
+          OptimadeStructure={OptimadeStructure}
+        />
       </div>
     </div>
   );

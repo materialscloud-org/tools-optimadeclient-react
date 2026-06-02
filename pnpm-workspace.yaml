@@ -2,3 +2,5 @@ allowBuilds:
   core-js: true
   core-js-pure: true
   esbuild: true
+minimumReleaseAgeExclude:
+  - matsci-parse@0.7.5

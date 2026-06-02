@@ -24,8 +24,8 @@ importers:
         specifier: ^4.0.8
         version: 4.0.8
       matsci-parse:
-        specifier: ^0.5.3
-        version: 0.5.3
+        specifier: 0.7.5
+        version: 0.7.5
       mc-periodic-table:
         specifier: ^0.0.2
         version: 0.0.2
@@ -4348,8 +4348,8 @@ packages:
     engines: {node: '>= 18'}
     hasBin: true
 
-  matsci-parse@0.5.3:
-    resolution: {integrity: sha512-oqHDTDEhmLDBftorN6Cf1IgwIYTs6ojH+Ezk600+kmnroHrmizjV4h3kMcxUXUICW+f3FxC2Z0g5TQu9pYQoMA==}
+  matsci-parse@0.7.5:
+    resolution: {integrity: sha512-Owy5oWinsqeqcukQCmFbICcjaQA6rxx9L1RnsBL+xsB0bfKZdCiIKFhZeLpA3VUvqFh8qvpuxAV2JyF744sAeQ==}
 
   mc-periodic-table@0.0.2:
     resolution: {integrity: sha512-bTbP/dKR43i7XFsoykH/ZkumAn78TCjf0Nf2PTZroxSosfujzGW8VGLfDuHPXD+CgO66/vO5WpEcoKsA0NFRMg==}
@@ -6223,6 +6223,9 @@ packages:
         optional: true
       yaml:
         optional: true
+
+  voro3d@0.0.7:
+    resolution: {integrity: sha512-V/3XsTN+2xr2FqPgzS6nm117MfawmfMWJ2zHD1dYcsTpwboIeu9vAguFIeS3sJ3eqP7dN/kHSGxWY4Xhf37siw==}
 
   w3c-hr-time@1.0.2:
     resolution: {integrity: sha512-z8P5DvDNjKDoFIHK7q8r8lackT6l+jo/Ye3HOle7l9nICP9lf1Ci25fy9vHd0JOWewkIFzXIEig3TdKT7JQ5fQ==}
@@ -11527,9 +11530,10 @@ snapshots:
       tiny-emitter: 2.1.0
       typed-function: 4.2.2
 
-  matsci-parse@0.5.3:
+  matsci-parse@0.7.5:
     dependencies:
       '@spglib/moyo-wasm': 0.7.9
+      voro3d: 0.0.7
 
   mc-periodic-table@0.0.2: {}
 
@@ -13621,6 +13625,8 @@ snapshots:
       jiti: 1.21.7
       lightningcss: 1.32.0
       terser: 5.48.0
+
+  voro3d@0.0.7: {}
 
   w3c-hr-time@1.0.2:
     dependencies:
