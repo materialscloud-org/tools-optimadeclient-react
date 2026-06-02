@@ -84,7 +84,7 @@ export function PTableWrapper({
       let scale = width / zoomLevel;
       scale = Math.max(0.1, Math.min(1.5, scale));
 
-      pt.style.setProperty("--font-size", `${18 * scale}px`);
+      pt.style.setProperty("--font-size", `${17.5 * scale}px`);
       pt.style.setProperty("--cell-size", `${54 * scale}px`);
       pt.style.setProperty("--font-scale-bottom", 0.45);
 
