@@ -5,3 +5,4 @@ allowBuilds:
 minimumReleaseAgeExclude:
   - matsci-parse@0.7.5
   - matsci-parse@0.8.4
+  - mc-periodic-table@0.0.4
