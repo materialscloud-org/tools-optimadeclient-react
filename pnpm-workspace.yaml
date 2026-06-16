@@ -4,3 +4,4 @@ allowBuilds:
   esbuild: true
 minimumReleaseAgeExclude:
   - matsci-parse@0.7.5
+  - matsci-parse@0.8.4
