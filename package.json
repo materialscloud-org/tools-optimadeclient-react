@@ -19,7 +19,7 @@
     "lodash.debounce": "^4.0.8",
     "matsci-parse": "0.8.4",
     "mc-periodic-table": "^0.0.4",
-    "mc-react-header": "^0.5.0",
+    "mc-react-header": "^0.5.3",
     "mc-react-library": "^0.5.0",
     "mc-react-structure-visualizer": "^0.10.0",
     "react": "^18.2.0",
@@ -35,6 +35,7 @@
     "eslint": "^9.33.0",
     "eslint-plugin-react": "^7.32.2",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "rollup-plugin-visualizer": "^7.0.1",
     "tailwindcss": "^4.1.16",
     "vite": "^7.1.2"
   }

@@ -6,3 +6,5 @@ minimumReleaseAgeExclude:
   - matsci-parse@0.7.5
   - matsci-parse@0.8.4
   - mc-periodic-table@0.0.4
+  - mc-react-header@0.5.2
+  - mc-react-header@0.5.3

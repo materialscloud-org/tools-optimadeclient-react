@@ -4,11 +4,18 @@ import "react-json-view-lite/dist/index.css";
 import { StructureViewerWithDownload } from "../OptimadeStructureHandler";
 import QEInputButton from "../common/QEInputButton";
 
+import { lazy, Suspense } from "react";
+
 import { containerStyleHalf } from "../../styles/containerStyles";
 
 import { fromOptimade, toCIF } from "matsci-parse";
 
-import { SmilesViewer } from "../OptimadeSmilesHandler";
+// lazy load Smiles Viewer for efficiency
+const SmilesViewer = lazy(() =>
+  import("../OptimadeSmilesHandler").then((mod) => ({
+    default: mod.SmilesViewer,
+  })),
+);
 
 function getSmiles(attributes) {
   if (!attributes) return null;
@@ -57,7 +64,9 @@ export function ResultViewer({ selectedResult }) {
                   OptimadeStructure={selectedResult}
                 />
               ) : shouldRenderSmiles ? (
-                <SmilesViewer smilesStr={smiles} width={450} height={450} />
+                <Suspense fallback={<div>Loading molecule viewer...</div>}>
+                  <SmilesViewer smilesStr={smiles} width={450} height={450} />
+                </Suspense>
               ) : (
                 <div className="text-center text-red-600">
                   No crystal structure or SMILES available
