@@ -201,6 +201,17 @@
     "providerUrl": "https://www.materialscloud.org/optimade/archive",
     "children": [
       {
+        "providerUrl": "https://optimade.materialscloud.org/archive/ed-g2",
+        "elements": {
+          "min": 1,
+          "max": 6
+        },
+        "sites": {
+          "min": 1,
+          "max": 96
+        }
+      },
+      {
         "providerUrl": "https://optimade.materialscloud.org/archive/1z-pd",
         "elements": {
           "min": 1,
@@ -223,25 +234,14 @@
         }
       },
       {
-        "providerUrl": "https://optimade.materialscloud.org/archive/ed-g2",
-        "elements": {
-          "min": 1,
-          "max": 6
-        },
-        "sites": {
-          "min": 1,
-          "max": 96
-        }
-      },
-      {
         "providerUrl": "https://optimade.materialscloud.org/archive/jk-9v",
         "elements": {
-          "min": null,
-          "max": null
+          "min": 2,
+          "max": 5
         },
         "sites": {
-          "min": null,
-          "max": null
+          "min": 5,
+          "max": 160
         }
       },
       {
@@ -397,12 +397,12 @@
       {
         "providerUrl": "http://optimade.openmaterialsdb.se",
         "elements": {
-          "min": null,
-          "max": null
+          "min": 6,
+          "max": 6
         },
         "sites": {
-          "min": null,
-          "max": null
+          "min": 140,
+          "max": 140
         }
       }
     ]
@@ -445,8 +445,8 @@
       {
         "providerUrl": "https://www.crystallography.net/tcod/optimade",
         "elements": {
-          "min": null,
-          "max": null
+          "min": 3,
+          "max": 3
         },
         "sites": {
           "min": null,
