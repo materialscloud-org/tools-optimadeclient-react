@@ -112,7 +112,7 @@ export async function getStructures({
 }) {
   if (!providerUrl) throw new Error("Provider URL is required");
 
-  await new Promise((r) => setTimeout(r, 1000)); // sleep 1 second
+  // await new Promise((r) => setTimeout(r, 1000)); // sleep 1 second
 
   const preferredFields = [
     "cartesian_site_positions",
