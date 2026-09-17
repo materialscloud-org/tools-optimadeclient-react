@@ -41,15 +41,3 @@ jobs:
           else
             echo "No changes detected, nothing to commit."
           fi
-
-      # Build site
-      - name: Build site
-        run: npm run build
-
-      # Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          branch: gh-pages
-          folder: dist
-          github-token: ${{ secrets.GITHUB_TOKEN }}
