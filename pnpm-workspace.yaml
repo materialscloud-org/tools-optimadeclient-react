@@ -8,3 +8,4 @@ minimumReleaseAgeExclude:
   - mc-periodic-table@0.0.4
   - mc-react-header@0.5.2
   - mc-react-header@0.5.3
+  - mc-react-header@0.7.2

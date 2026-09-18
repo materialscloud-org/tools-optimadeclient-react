@@ -39,8 +39,8 @@ importers:
         specifier: ^0.0.4
         version: 0.0.4
       mc-react-header:
-        specifier: ^0.5.3
-        version: 0.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.7.2
+        version: 0.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       mc-react-library:
         specifier: ^0.5.0
         version: 0.5.3(bootstrap-icons@1.13.1)(bootstrap@5.3.8(@popperjs/core@2.11.8))(react-bootstrap@2.10.10(@types/react@19.2.17)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -1219,6 +1219,7 @@ packages:
   eslint@9.39.4:
     resolution: {integrity: sha512-XoMjdBOwe/esVgEvLmNsD3IRHkm7fbKIUGvrleloJXUZgDHig2IPWNniv+GwjyJXzuNqVjlr5+4yVUZjycJwfQ==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
     peerDependencies:
       jiti: '*'
@@ -1710,8 +1711,8 @@ packages:
   mc-periodic-table@0.0.4:
     resolution: {integrity: sha512-he4yo8Px4aM6aRgxYjsBpxVmcN+Tp4YBza4O4X8LeDr+KQ/YC8PstS7Be8VrhNnmndipvrcnwvldNSZzQSSaCg==}
 
-  mc-react-header@0.5.3:
-    resolution: {integrity: sha512-P/HoGUm9l7S/b9aW/bkVgCS55BcYz2ZfDNLmMLfyZKYy46XYC64pDkWji+pHOCNr3h5deHmfjgjV5AlwT0+f4g==}
+  mc-react-header@0.7.2:
+    resolution: {integrity: sha512-GgiGqu1g1BT/6p1+Mc4hi3ajQrIElbhPJs4xuIAeWDevtb5O8iu9elLcw333q55gbk7YOtzFmauFyJBqFepvlg==}
     peerDependencies:
       react: ^18.2.0
       react-dom: ^18.2.0
@@ -3936,7 +3937,7 @@ snapshots:
 
   mc-periodic-table@0.0.4: {}
 
-  mc-react-header@0.5.3(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  mc-react-header@0.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
