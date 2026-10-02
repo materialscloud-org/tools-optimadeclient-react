@@ -9,3 +9,5 @@ minimumReleaseAgeExclude:
   - mc-react-header@0.5.2
   - mc-react-header@0.5.3
   - mc-react-header@0.7.2
+  - matsci-parse@0.17.0
+  - mc-periodic-table@0.2.1

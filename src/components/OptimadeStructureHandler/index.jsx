@@ -3,26 +3,9 @@ import { StructureDownload } from "../common/StructureDownload";
 
 import { textError } from "../../styles/textStyles";
 import { containerStyle } from "../../styles/containerStyles";
-import { fromOptimade, toCIF } from "matsci-parse";
 
-export function StructureViewerWithDownload({ OptimadeStructure }) {
-  let structure = null;
-  let cifText = "";
-  let hasError = false;
-
-  try {
-    if (OptimadeStructure) {
-      structure = fromOptimade(OptimadeStructure);
-      cifText = structure ? toCIF(structure) : "";
-    } else {
-      hasError = true;
-    }
-  } catch (err) {
-    console.error("Failed to parse OptimadeStructure:", err);
-    hasError = true;
-  }
-
-  if (hasError || !OptimadeStructure?.attributes?.cartesian_site_positions) {
+export function StructureViewerWithDownload({ structure, OptimadeStructure }) {
+  if (!structure?.lattice || !structure?.sites?.length) {
     return (
       <div
         className={`${containerStyle} min-h-[450px] flex items-center justify-center`}
@@ -39,7 +22,7 @@ export function StructureViewerWithDownload({ OptimadeStructure }) {
   return (
     <div className="relative min-h-[450px]">
       <div className="w-full h-[450px]">
-        <StructureVisualizer key={cifText} cifText={cifText} />
+        <StructureVisualizer structure={structure} />
       </div>
 
       <div className="absolute top-2 right-2 z-10">

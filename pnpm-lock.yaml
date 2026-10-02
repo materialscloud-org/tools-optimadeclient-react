@@ -36,8 +36,8 @@ importers:
         specifier: 0.16.4
         version: 0.16.4
       mc-periodic-table:
-        specifier: ^0.0.4
-        version: 0.0.4
+        specifier: ^0.2.1
+        version: 0.2.1
       mc-react-header:
         specifier: ^0.7.2
         version: 0.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -45,8 +45,8 @@ importers:
         specifier: ^0.5.0
         version: 0.5.3(bootstrap-icons@1.13.1)(bootstrap@5.3.8(@popperjs/core@2.11.8))(react-bootstrap@2.10.10(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       mc-react-structure-visualizer:
-        specifier: ^0.10.0
-        version: 0.10.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.11.1
+        version: 0.11.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -808,6 +808,12 @@ packages:
   '@spglib/moyo-wasm@0.18.0':
     resolution: {integrity: sha512-xFilBO8piFZ/Z99nimN8oAljLo/2q1qGaUQV7T5ZvA+D2LGnz6W3Xj0ghD70/YpWYCtvg1DtymHLaQChk/F36Q==}
 
+  '@spglib/moyo-wasm@0.21.0':
+    resolution: {integrity: sha512-VP9B0VbzzdP5ZSUkMzSQj3T7SmhGxFHWZm0GyNidTesfuX+wIvu15l4EcwSlLPYkFyGXC6S6kAd2nObCvASk2w==}
+
+  '@spglib/moyo-wasm@0.7.9':
+    resolution: {integrity: sha512-OTutVoqRkInR+ZrBuwS3z/yolCRsNGEMm87tz822NxiajGmXnU+7L9bVlqHCPck7+CeCCR3H60Mzr94W20vu6w==}
+
   '@swc/helpers@0.5.23':
     resolution: {integrity: sha512-5lSsMOTXURePglDfvuAQUqkGek9Hg2kksOYay2m0+XR++b2NWYL/4sWyuvVBIs8oKnJaxkdi9whaL/sqN13afw==}
 
@@ -1321,8 +1327,17 @@ packages:
   matsci-parse@0.16.4:
     resolution: {integrity: sha512-QwoouDZwnOcCI98o4CgvMUzMTDPqX3BPYVpd3owQPduy0g1ycTNmCVNjivrqiUkD3yJOCuhTDw9lss8Xc/x0fg==}
 
-  mc-periodic-table@0.0.4:
-    resolution: {integrity: sha512-he4yo8Px4aM6aRgxYjsBpxVmcN+Tp4YBza4O4X8LeDr+KQ/YC8PstS7Be8VrhNnmndipvrcnwvldNSZzQSSaCg==}
+  matsci-parse@0.17.0:
+    resolution: {integrity: sha512-cDlkagfENI0HrPjfvfqWqTWzHmCJB7kMfo57GT20xOWgcJCLDEwp5GZ2bBegVs8PdpatNoBSeFNHypV1p+pe/A==}
+
+  matsci-parse@0.8.4:
+    resolution: {integrity: sha512-mQ2KF8XEfHPJWfJoF2I3O7QRUHZs/Q4Gzz9D5tahqeXVCauiiSh1VgCMi6SzXI1dyS7k2nyb0v2/0v7VPZZhWw==}
+
+  mc-periodic-table@0.1.4:
+    resolution: {integrity: sha512-eV7veuz6zJFuB+U14qmaKWDwmDNYqoqA4mr03LFjUdTyjrvtClhhE0RlQZXihZ+hzDxAmWWIbqxAosfXovMrxg==}
+
+  mc-periodic-table@0.2.1:
+    resolution: {integrity: sha512-KFwhlJOZflKePMw2rccXQ+ssg6H/hOR8XBpuZqUZ7LLUNm58I7dbLZYc6GhbFb9dMMtVU5k3HpnP47RDDZkv+w==}
 
   mc-react-header@0.7.2:
     resolution: {integrity: sha512-GgiGqu1g1BT/6p1+Mc4hi3ajQrIElbhPJs4xuIAeWDevtb5O8iu9elLcw333q55gbk7YOtzFmauFyJBqFepvlg==}
@@ -1339,8 +1354,8 @@ packages:
       react-bootstrap: ^2.10.1
       react-dom: ^18.2.0
 
-  mc-react-structure-visualizer@0.10.0:
-    resolution: {integrity: sha512-CfPs+Kv3i/gDiWgPLYZ6Mu1PBNyayMlk/SVpA2+d61o/e/IlcyTSXoEfSaqA4j5XaB864gmiWi6oVx1lkyZ23w==}
+  mc-react-structure-visualizer@0.11.1:
+    resolution: {integrity: sha512-hXfs+txJfp0GHl/zxN1kMBEmSK1kg/hugN8G4+NO10HBu4IettPY+WckPLb2Uf7ork2oJ9QBHNO6U+U+9dzQkw==}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
@@ -2289,6 +2304,10 @@ snapshots:
 
   '@spglib/moyo-wasm@0.18.0': {}
 
+  '@spglib/moyo-wasm@0.21.0': {}
+
+  '@spglib/moyo-wasm@0.7.9': {}
+
   '@swc/helpers@0.5.23':
     dependencies:
       tslib: 2.8.1
@@ -2728,7 +2747,21 @@ snapshots:
       txml: 6.0.3
       voro3d: 0.0.7
 
-  mc-periodic-table@0.0.4: {}
+  matsci-parse@0.17.0:
+    dependencies:
+      '@spglib/moyo-wasm': 0.21.0
+      txml: 6.0.3
+
+  matsci-parse@0.8.4:
+    dependencies:
+      '@spglib/moyo-wasm': 0.7.9
+      voro3d: 0.0.7
+
+  mc-periodic-table@0.1.4: {}
+
+  mc-periodic-table@0.2.1:
+    dependencies:
+      matsci-parse: 0.17.0
 
   mc-react-header@0.7.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
@@ -2743,10 +2776,12 @@ snapshots:
       react-bootstrap: 2.10.10(@types/react@19.3.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-dom: 18.3.1(react@18.3.1)
 
-  mc-react-structure-visualizer@0.10.0(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  mc-react-structure-visualizer@0.11.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       3dmol: 2.5.5
       mathjs: 12.4.3
+      matsci-parse: 0.8.4
+      mc-periodic-table: 0.1.4
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
 

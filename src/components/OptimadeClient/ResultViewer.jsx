@@ -61,6 +61,8 @@ export function ResultViewer({ selectedResult }) {
             <div className="w-full md:w-1/2">
               {shouldRenderCrystal ? (
                 <StructureViewerWithDownload
+                  key={cifText}
+                  structure={structureData}
                   OptimadeStructure={selectedResult}
                 />
               ) : shouldRenderSmiles ? (
