@@ -1,6 +1,6 @@
 import Slider from "@mui/material/Slider";
 
-import { textNormal, textSmall } from "../../styles/textStyles";
+import { textNormal } from "../../styles/textStyles";
 
 const inputOverride = `w-12 text-center bg-transparent border-none outline-none p-0
   [&::-webkit-inner-spin-button]:appearance-none

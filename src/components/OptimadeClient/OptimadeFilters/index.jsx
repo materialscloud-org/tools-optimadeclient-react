@@ -4,7 +4,7 @@ import { QueryTextBox } from "./OptimadeRawQuery";
 import RangeSlider from "../../common/RangeSlider";
 import { buildQueryString } from "./OptimadeRawQuery/buildQueryString";
 
-import { textNormal, textSmall } from "../../../styles/textStyles";
+import { textSmall } from "../../../styles/textStyles";
 
 export default function OptimadeFilters({ queryUrl, initialFilter, onSubmit }) {
   // Parent can optionally pass an initial filter string

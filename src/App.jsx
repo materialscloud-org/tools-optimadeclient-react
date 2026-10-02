@@ -1,4 +1,3 @@
-import { useState } from "react";
 import MaterialsCloudHeader from "mc-react-header";
 
 import { OptimadeClient } from "./components/OptimadeClient";

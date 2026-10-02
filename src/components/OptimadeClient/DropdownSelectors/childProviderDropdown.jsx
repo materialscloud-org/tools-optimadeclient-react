@@ -1,9 +1,6 @@
 import { useState, useEffect, useRef } from "react";
-import { getProviderLinks } from "../../../api";
 import { longSlateDropdown } from "../../../styles/dropdownStyles";
 import { baseButtonStyle } from "../../../styles/buttonStyles";
-
-import { useQuery } from "@tanstack/react-query";
 
 export default function ChildProviderDropdown({
   selectedProvider,

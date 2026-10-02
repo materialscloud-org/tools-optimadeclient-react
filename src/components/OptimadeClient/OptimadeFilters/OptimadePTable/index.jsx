@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { symbols, names } from "mc-periodic-table";
+import { symbols } from "mc-periodic-table";
 
 import HelpIcon from "../../../common/HelpIcon";
 import { PTableWrapper } from "../../../common/PTableWrapper";

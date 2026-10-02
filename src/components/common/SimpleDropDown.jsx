@@ -16,7 +16,7 @@ export function SimpleDropDown({
   useEffect(() => {
     if (options.length > 0 && !value) {
       setSelectedValue(options[0].value);
-      onChange && onChange(options[0]);
+      if (onChange) onChange(options[0]);
     }
   }, [options, value]);
 

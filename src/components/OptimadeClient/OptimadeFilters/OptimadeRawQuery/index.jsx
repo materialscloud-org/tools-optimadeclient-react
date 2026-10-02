@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 import { textNormal } from "../../../../styles/textStyles";
 import { baseButtonStyle } from "../../../../styles/buttonStyles";

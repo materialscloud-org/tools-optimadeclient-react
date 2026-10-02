@@ -74,15 +74,11 @@ export async function getProviderLinks(baseUrl) {
 
 // --- Custom info fetch subdatabase info ---
 export async function getCustomInfo({ baseUrl }) {
-  try {
-    const json = await fetchWithCorsFallback(`${baseUrl}/info/`);
-    if (!json || !json.meta) {
-      throw new Error("Invalid OPTIMADE response");
-    }
-    return { meta: json.meta };
-  } catch (error) {
-    throw error;
+  const json = await fetchWithCorsFallback(`${baseUrl}/info/`);
+  if (!json || !json.meta) {
+    throw new Error("Invalid OPTIMADE response");
   }
+  return { meta: json.meta };
 }
 
 // --- Provider structure info ---

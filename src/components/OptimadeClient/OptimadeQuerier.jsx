@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect } from "react";
 import { getProvidersList, getProviderLinks, getStructures } from "../../api";
 import OptimadeFilters from "./OptimadeFilters";
 import ResultsDropdown from "./ResultsDropdown";
@@ -145,23 +145,25 @@ export function OptimadeQuerier({
     queryFn: async () => {
       if (!selectedChild?.base_url) return null;
       // Wrap the fetch in a timeout promise
-      const fetchWithTimeout = new Promise(async (resolve, reject) => {
+      const fetchWithTimeout = new Promise((resolve, reject) => {
         const timer = setTimeout(() => {
           reject(new Error("Request timed out after 25 seconds"));
         }, TIMEOUT_MS);
 
-        try {
-          const data = await getStructures({
-            providerUrl: selectedChild.base_url,
-            filter: currentFilter,
-            page: currentPage,
-          });
-          clearTimeout(timer);
-          resolve(data);
-        } catch (err) {
-          clearTimeout(timer);
-          reject(new Error(err?.message));
-        }
+        getStructures({
+          providerUrl: selectedChild.base_url,
+          filter: currentFilter,
+          page: currentPage,
+        }).then(
+          (data) => {
+            clearTimeout(timer);
+            resolve(data);
+          },
+          (err) => {
+            clearTimeout(timer);
+            reject(new Error(err?.message));
+          },
+        );
       });
 
       return fetchWithTimeout;
