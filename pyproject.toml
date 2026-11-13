@@ -23,3 +23,8 @@ include = [
     "optimadewidget/widget-dist/*.js",
     "optimadewidget/widget-dist/*.css"
 ]
+# ignore-vcs (needed to ship the gitignored widget-dist/) also stops hatch from
+# skipping node_modules etc., so list the sdist contents explicitly.
+[tool.hatch.build.targets.sdist]
+include = ["/optimadewidget", "/tests", "/README.md"]
+exclude = ["__pycache__"]
