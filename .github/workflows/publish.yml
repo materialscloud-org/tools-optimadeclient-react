@@ -16,25 +16,44 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+
+      - name: Check tag matches package version
+        run: |
+          version=$(grep -m1 '^version = ' pyproject.toml | cut -d'"' -f2)
+          if [ "v${version}" != "${GITHUB_REF_NAME}" ]; then
+            echo "Tag ${GITHUB_REF_NAME} does not match pyproject.toml version ${version}"
+            exit 1
+          fi
+
+      - uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
 
       - name: Set up Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: "3.10"
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install hatch hatch-jupyter-builder
-
       - name: Build the widget JS
         run: |
-          npm ci
-          npm run build:widget
+          pnpm install --frozen-lockfile
+          pnpm build:widget
 
       - name: Build Python package
-        run: hatch build
+        run: |
+          python -m pip install --upgrade pip hatch
+          hatch build
+
+      - name: Check the wheel ships the widget bundle
+        run: |
+          python -m zipfile -l dist/*.whl | tee wheel-contents.txt
+          grep -q "optimadewidget/widget-dist/optimade_widget.js" wheel-contents.txt
+          grep -q "optimadewidget/widget-dist/optimade_widget.css" wheel-contents.txt
 
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1

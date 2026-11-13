@@ -1,0 +1,85 @@
+/*
+  Stylesheet for the Jupyter/AiiDAlab widget build.
+
+  Unlike src/index.css, this must not touch the host page: Tailwind's
+  preflight (a global reset of html/body/button/input/...) and the body
+  background would restyle the whole notebook and every other ipywidget.
+  So only the theme variables and utility classes are pulled in, and a
+  minimal reset is scoped to the widget root (.optimade-widget).
+
+  TODO: Decide whether we should just always scope components site wide...
+*/
+@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+
+@layer base {
+  .optimade-widget {
+    font-family: var(
+      --default-font-family,
+      ui-sans-serif,
+      system-ui,
+      sans-serif
+    );
+    line-height: 1.5;
+    color: var(--color-gray-900, #111827);
+  }
+
+  .optimade-widget *,
+  .optimade-widget ::before,
+  .optimade-widget ::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    border: 0 solid;
+  }
+
+  .optimade-widget h1,
+  .optimade-widget h2,
+  .optimade-widget h3,
+  .optimade-widget h4,
+  .optimade-widget h5,
+  .optimade-widget h6 {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+
+  .optimade-widget a {
+    color: inherit;
+    text-decoration: inherit;
+  }
+
+  .optimade-widget ol,
+  .optimade-widget ul {
+    list-style: none;
+  }
+
+  .optimade-widget img,
+  .optimade-widget svg {
+    display: block;
+    vertical-align: middle;
+  }
+
+  .optimade-widget img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  .optimade-widget button,
+  .optimade-widget input,
+  .optimade-widget select,
+  .optimade-widget textarea {
+    font: inherit;
+    color: inherit;
+    background-color: transparent;
+    border-radius: 0;
+  }
+
+  .optimade-widget button {
+    cursor: pointer;
+  }
+
+  .optimade-widget table {
+    border-collapse: collapse;
+  }
+}

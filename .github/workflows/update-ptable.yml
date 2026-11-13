@@ -19,13 +19,16 @@ jobs:
           fetch-depth: 0 # required for committing
           persist-credentials: true
 
+      - uses: pnpm/action-setup@v4
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: pnpm
 
       - name: Install deps
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Run cache generation script
         run: node scripts/build-ptable-cache.mjs

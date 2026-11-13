@@ -4,11 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "widget-optimade-client"
-version = "0.1.0"
+version = "0.2.0"
 description = "A Jupyter widget for querying OPTIMADE-compatible providers"
 readme = "README.md"
 requires-python = ">=3.8"
-dependencies = ["traitlets>=5.0", "anywidget>=0.2"]
+dependencies = ["traitlets>=5.0", "anywidget>=0.2", "ipywidgets>=8"]
+
+[project.optional-dependencies]
+aiidalab = ["ase>=3.22", "numpy"]
 
 [tool.hatch.build]
 ignore-vcs = true

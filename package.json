@@ -4,6 +4,7 @@
   "version": "0.0.0",
   "homepage": "https://bud-macaulay.github.io/mc-react-optimade-client",
   "type": "module",
+  "packageManager": "pnpm@11.2.2",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
